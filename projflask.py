@@ -61,6 +61,25 @@ def staffHome():
 def customerHome():
     return render_template('customerHome.html')
 
+@app.route('/flightView')
+def flightView():
+    return render_template('customerView.html')
+
+@app.route('/customerFlightSearch')
+def customerFlightSearch():
+    return render_template('customerSearch.html')
+
+@app.route('/ticketPurchase')
+def ticketPurchase():
+    return render_template('customerPurchase.html')
+
+@app.route('/flightRate')
+def flightRate():
+    return render_template('customerRate.html')
+
+@app.route('/moneyTrack')
+def moneyTrack():
+    return render_template('customerSpending.html')
 
 
 
@@ -255,6 +274,19 @@ def statusSearchProcess():
         print(each)
     cursor.close()
     return render_template('pastFlightStatus.html', username=username, posts=data1)
+
+
+
+
+
+@app.route('/logout')
+def logout():
+    session.pop('username')
+    return redirect('/goodbye')
+
+@app.route('/goodbye')
+def goodbye():
+    return render_template('logout.html')
 
 
 
