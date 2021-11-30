@@ -1,0 +1,50 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>flightSearch</title>
+</head>
+
+<body>
+    <h1>You can search the flights here</h1><br>
+    All fields are required.
+    <form action="/flightSearchProcess" method="POST">
+        Enter the departure date here:
+        <input type="date" name = "dep_date" placeholder="departure date" required/> </br>
+        Enter the departure airport here:
+
+        <input type="text" name = "dep_airport" placeholder="departure airport" required/></br>
+        Enter the arrival airport here:
+
+        <input type="text" name = "arr_airport" placeholder="arrival airport" required/></br>
+
+        <input type="submit" value = Search />
+        {% if error %}
+            <p class="error"><strong>Error:</strong> {{error}}</p>
+        {% endif %}
+    </form>
+    <table>
+        <th>Airline name</th>
+        <th>departure date</th>
+        <th>departure time</th>
+        <th>flight number</th>
+        <th>arrival date</th>
+        <th>arrival time</th>
+
+    
+    {% for line in posts %}
+        <tr>
+            <td>{{line['airline_name']}}</td>
+            <td>{{line['d_date']}}</td>
+            <td>{{line['d_time']}}</td>
+            <td>{{line['flight_num']}}</td>            
+            <td>{{line['a_date']}}</td>
+            <td>{{line['a_time']}}</td>
+        </tr>
+    {% endfor %}
+    </table>
+    
+</table>
+    
+    <a href="/publicCheck">Go back to public service page</a>
+</body>
+</html>

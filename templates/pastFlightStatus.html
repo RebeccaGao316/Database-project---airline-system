@@ -1,0 +1,56 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>pastFlightStatus</title>
+</head>
+
+<body>
+<h1>You can search the status of flights here</h1><br>
+airline name and flight number is required.
+You can also add arrival date and departure date for more specific search.
+
+    <form action="/statusSearchProcess" method="POST">
+        Enter the airline name airport here:
+
+        <input type="text" name = "airlineName" placeholder="airline name" required/> </br>
+        Enter the flight number here:
+
+        <input type="text" name = "flightNum" placeholder="flight number" required/></br>
+        Enter the arrival date here:
+
+        <input type="date" name = "arrivalDate" placeholder="arrival date" required/></br>
+        Enter the departure airport here:
+
+        <input type="date" name = "departureDate" placeholder="departure date" required/></br>
+
+
+        <input type="submit" value = Search />
+        {% if error %}
+            <p class="error"><strong>Error:</strong> {{error}}</p>
+        {% endif %}
+    </form>
+    
+    <table>
+        <th>Airline name</th>
+        <th>departure date</th>
+        <th>flight number</th>
+        <th>status</th>
+        <th>arrival time</th>
+
+    
+    {% for line in posts %}
+        <tr>
+            <td>{{line['airline_name']}}</td>
+            <td>{{line['d_date']}}</td>
+            <td>{{line['flight_num']}}</td>            
+            <td>{{line['status']}}</td>
+        </tr>
+    {% endfor %}
+    </table>
+    
+    <a href="/publicCheck">Go back to public service page</a>
+
+
+
+</body>
+</html>

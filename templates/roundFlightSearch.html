@@ -1,0 +1,55 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>roundFlightSearch</title>
+</head>
+
+<body>
+    <h1>You can search the round flights here</h1><br>
+    All fields are required.
+
+    <form action="/roundFlightSearchProcess" method="POST">
+        Enter the departure date here:
+
+        <input type="date" name = "dep_date" placeholder="departure date" required/> </br>
+        Enter the departure airport here:
+
+        <input type="text" name = "dep_airport" placeholder="departure airport" required/></br>
+        Enter the arrival airport here:
+
+        <input type="text" name = "arr_airport" placeholder="arrival airport" required/></br>
+
+        Enter the return date here:
+
+        <input type="date" name = "return_date" placeholder="return date" required/></br>
+
+
+        <input type="submit" value = Search />
+        {% if error %}
+            <p class="error"><strong>Error:</strong> {{error}}</p>
+        {% endif %}
+    </form>
+<h1>currently, only the first flight will be showed</h1>
+    <table>
+        <th>Airline name</th>
+        <th>flight number</th>
+        <th>return airline name</th>
+        <th>return flight number</th>
+
+    
+    {% for line in posts %}
+        <tr>
+            <td>{{line['airline_name']}}</td>
+            <td>{{line['flight_num']}}</td>            
+        </tr>
+    {% endfor %}
+    </table>
+    
+</table>
+    
+
+    
+    <a href="/publicCheck">Go back to public service page</a>
+
+</body>
+</html>
