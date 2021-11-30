@@ -7,7 +7,34 @@
 <body>
 
 <h1>this is the page for customers to view the flights</h1>
+<h1>You can search the future flights here</h1><br>
+
+    <form action="/checkFutureFlights" method="GET">
+        
+        <input type="submit" value = check />
+        
+    </form>
+    <h1>this is your future flights</h1>
+    <table>
+        <th>Airline name</th>
+        <th>departure date</th>
+        <th>departure time</th>
+        <th>flight number</th>
+
     
+    {% for line in posts %}
+        <tr>
+            <td>{{line['airline_name']}}</td>
+            <td>{{line['d_date']}}</td>
+            <td>{{line['d_time']}}</td>
+            <td>{{line['flight_num']}}</td>            
+
+        </tr>
+    {% endfor %}
+    </table>
+
+
+
     <a href="/customerHome">Go back to home</a>
 
 </body>

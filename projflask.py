@@ -276,6 +276,24 @@ def statusSearchProcess():
     return render_template('pastFlightStatus.html', username=username, posts=data1)
 
 
+@app.route('/checkFutureFlights', methods=['GET', 'POST'])
+def checkFutureFlights():
+    username = session['username']
+
+    #cursor used to send queries
+    cursor = conn.cursor()
+    #executes query
+    query = 'select * from ticket where customer_email = %s and d_date > CURRENT_DATE or (d_date = current_date and d_time > current_time)'
+    #stores the results in a variable
+    cursor.execute(query,(username))
+    data1 = cursor.fetchall()
+    for each in data1:
+        print(each)
+    cursor.close()
+    return render_template('customerView.html', username=username, posts=data1)
+
+
+
 
 
 
