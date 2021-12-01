@@ -338,6 +338,53 @@ def purchaseTicket():
     return render_template('purchaseDone.html')
 
 
+
+@app.route('/pastFlightHistory', methods=['GET', 'POST'])
+def pastFlightHistory():
+
+    username = session['username']
+
+    #cursor used to send queries
+    cursor = conn.cursor()
+    #executes query
+    query = 'SELECT * FROM ticket as t left outer join rate as r ' \
+            'on (t.airline_name = r.airline_name and t.d_date = r.d_date and ' \
+            't.d_time = r.d_time and t.flight_num = r.flight_num and ' \
+            't.customer_email = r.customer_email)' \
+            'WHERE t.customer_email = %s and ' \
+            '(t.d_date < current_date() or (t.d_date = current_date() and t.d_time < current_time()))'
+
+    cursor.execute(query, (username))
+    #stores the results in a variable
+    data1 = cursor.fetchall()
+    for each in data1:
+        print(each)
+    cursor.close()
+    return render_template('customerRate.html', username=username, posts=data1)
+@app.route('/rateAndComment',methods=['GET', 'POST'])
+def rateAndComment():
+    username = session['username']
+    #grabs information from the forms
+    airlineName = request.form['airlineName']
+    flightNum = request.form['flightNum']
+    departureTime = request.form['d_time']
+    departureDate = request.form['d_date']
+    star = request.form['star']
+    comment = request.form['comment']
+
+
+    #cursor used to send queries
+    cursor = conn.cursor()
+
+    #query = 'INSERT INTO ticket (card_type,card_num,expire_date,purchase_date,' \
+    #        'purchase_time,airline_name,d_date, d_time,flight_num,customer_email,sold_price,tID)'\
+    #       'VALUES (%s,%s,%s,date.today(),datetime.now(),%s,%s,%s,%s,%s,100,20)'
+    query = 'insert into rate VALUES(%s,%s,%s,%s,%s,%s,%s)'
+    cursor.execute(query,(airlineName,departureDate,departureTime,flightNum,username,comment,star))
+    conn.commit()
+    cursor.close()
+    return render_template('customerRate.html')
+
 @app.route('/logout')
 def logout():
     session.pop('username')

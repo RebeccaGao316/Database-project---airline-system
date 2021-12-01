@@ -7,6 +7,61 @@
 <body>
 
     <h1>this is the page for customers to rate the flights</h1>
+    please click button to check all past flight.
+    Only flights without star rate will be show!<br>
+    <form action="/pastFlightHistory" method="POST">
+
+        <input type="submit" value = check past flight />
+        {% if error %}
+            <p class="error"><strong>Error:</strong> {{error}}</p>
+        {% endif %}
+    </form>
+    <table>
+        <th>Airline name</th>
+        <th>departure date</th>
+        <th>departure time</th>
+        <th>flight number</th>
+        <th>star 0-5</th>
+        <th>comment</th>
+
+
+
+        {% for line in posts %}
+            <tr>
+                <td>{{line['airline_name']}}</td>
+                <td>{{line['d_date']}}</td>
+                <td>{{line['d_time']}}</td>
+                <td>{{line['flight_num']}}</td>
+                <td>{{line['star']}}</td>
+                <td>{{line['comment']}}</td>
+            </tr>
+        {% endfor %}
+    </table>
+
+    <h1>You can comment the flight in the past! you can only comment trips without comment and rate</h1>
+    <h1>Following form to select a tickets and give payment information</h1>
+    <h1>def: flight in the past means flight earlier than today or flight today with dep time < current time</h1>
+
+    <form action="/rateAndComment" method="POST">
+        Enter the star here:
+        <input type="integer" name = "star" placeholder="star(1-5)" required/> </br>
+        Enter the comment here, at most 200 char:
+
+        <input type="text" name = "comment" placeholder="comment" required/></br>
+
+        copy the airline name from the search result here:
+        <input type="text" name = "airlineName" placeholder="airline name" required/></br>
+        copy the departure date from the search result here:
+        <input type="text" name = "d_date" placeholder="departure date" required/></br>
+        copy the departure time from the search result here:
+        <input type="text" name = "d_time" placeholder="departure time" required/></br>
+        copy the flight number from the search result here:
+        <input type="text" name = "flightNum" placeholder="flight number" required/></br>
+        <input type="submit" value = comment! />
+        {% if error %}
+            <p class="error"><strong>Error:</strong> {{error}}</p>
+        {% endif %}
+    </form>
 
     
     <a href="/customerHome">Go back to home</a>
