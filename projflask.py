@@ -296,7 +296,6 @@ def checkFutureFlights():
 
 
 
-
 @app.route('/logout')
 def logout():
     session.pop('username')

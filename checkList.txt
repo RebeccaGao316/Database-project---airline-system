@@ -1,0 +1,24 @@
+public:
+1.view public info: round trip need change
+2.register - done
+3.login - need md5(password)
+
+customer:
+4.view flights - done
+5+6.search for flight and purchase - /
+7.rate and comment - /
+8.track spending - /
+9. customer logout - edit after 5+6 is implemented. Clear session for ticket info.
+
+airline staff:
+10. view flight - /
+11. create  new flight
+12.change status of flight
+13. add airplane in the system
+14.add airport in the system
+15. view flight ratings
+16.view frequency customer
+17.view reports
+18.view revenue
+19.view top destinations
+20. staff logout
