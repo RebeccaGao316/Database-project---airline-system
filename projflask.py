@@ -71,9 +71,7 @@ def flightView():
 def customerFlightSearch():
     return render_template('customerSearch.html')
 
-@app.route('/ticketPurchase')
-def ticketPurchase():
-    return render_template('customerPurchase.html')
+
 
 @app.route('/flightRate')
 def flightRate():
