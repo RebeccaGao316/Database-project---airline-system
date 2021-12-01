@@ -1,6 +1,8 @@
 
 from flask import Flask, render_template, request, session, url_for, redirect
 import pymysql.cursors
+from datetime import date
+
 app = Flask(__name__)
 #Configure MySQL
 conn = pymysql.connect(host='localhost',
@@ -292,8 +294,40 @@ def checkFutureFlights():
     cursor.close()
     return render_template('customerView.html', username=username, posts=data1)
 
+@app.route('/purchaseTicket',methods=['GET', 'POST'])
+def purchaseTicket():
+    username = session['username']
+    #grabs information from the forms
+    airlineName = request.form['airlineName']
+    flightNum = request.form['flightNum']
+    departureTime = request.form['d_time']
+    departureDate = request.form['d_date']
+    cardType = request.form['cardType']
+    cardNum = request.form['cardNum']
+    expDate = request.form['expDate']
 
-
+    #cursor used to send queries
+    cursor = conn.cursor()
+    #executes query
+    query = 'select count(*) from ticket natural join flight ' \
+            'where flight_num = %s and airline_name = %s and d_date = %s and d_time = %s '
+    #stores the results in a variable
+    cursor.execute(query,(flightNum,airlineName,departureDate,departureTime))
+    currentSell = cursor.fetchone()
+    query = 'select distinct number_seat from flight natural join airline natural join airplane ' \
+            'where flight_num = %s and airline_name = %s and d_date = %s and d_time = %s '
+    cursor.execute(query,(flightNum,airlineName,departureDate,departureTime))
+    totalNum = cursor.fetchone();
+    if(currentSell == totalNum):
+        return render_template('404.html')
+    #query = 'INSERT INTO ticket (card_type,card_num,expire_date,purchase_date,' \
+    #        'purchase_time,airline_name,d_date, d_time,flight_num,customer_email,sold_price,tID)'\
+     #       'VALUES (%s,%s,%s,date.today(),datetime.now(),%s,%s,%s,%s,%s,100,20)'
+    query = 'INSERT INTO ticket VALUES ("1",20,%s,%s,%s, null,null,%s,%s,%s,%s,%s)'
+    cursor.execute(query,(cardType,cardNum,expDate,airlineName,departureDate,departureTime,flightNum,username))
+    conn.commit()
+    cursor.close()
+    return render_template('purchaseDone.html')
 
 
 @app.route('/logout')

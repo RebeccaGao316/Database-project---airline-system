@@ -5,7 +5,8 @@ public:
 
 customer:
 4.view flights - done
-5+6.search for flight and purchase - /
+5+6.search for flight and purchase - need to calculate sold price and let tID auto increment!
+Current usage will cause a conflict in tID(primary key
 7.rate and comment - /
 8.track spending - /
 9. customer logout - edit after 5+6 is implemented. Clear session for ticket info.

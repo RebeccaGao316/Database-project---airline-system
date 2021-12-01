@@ -10,7 +10,9 @@
     <h1>please redirect to the public search page to do the search</h1>
 
     <a href="/publicCheck">Go back to public search service</a>
-    <a href="/customerHome">Go back to home</a>
+    {% if session['username'] %}
+        <a href="/customerHome">Go back to home</a>
+    {% endif %}
 
 </body>
 </html>

@@ -17,7 +17,10 @@
 
 	<a href="/pastFlightStatus">You can see the status of flight here!</a><br>
     <a href="/">go back to public homepage</a><br>
-    <a href="/customerHome">go back to customer home</a><br>
+
+    {% if session['username'] %}
+        <a href="/customerHome">go back to customer home</a><br>
+    {% endif %}
 
 </body>
 </html>

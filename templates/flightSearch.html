@@ -42,9 +42,37 @@
         </tr>
     {% endfor %}
     </table>
-    
-</table>
-    
+
+
+    {% if session['username'] %}
+        <h1>You can buy the ticket since you have already login!</h1>
+        <h1>Following form to select a tickets and give payment information</h1>
+        <form action="/purchaseTicket" method="POST">
+            Enter the card type here:
+            <input type="text" name = "cardType" placeholder="card type" required/> </br>
+            Enter the card number here:
+
+            <input type="text" name = "cardNum" placeholder="card number" required/></br>
+
+            Enter the exp date here:
+
+            <input type="date" name = "expDate" placeholder="expire date" required/></br>
+            copy the airline name from the search result here:
+            <input type="text" name = "airlineName" placeholder="airline name" required/></br>
+            copy the departure date from the search result here:
+            <input type="text" name = "d_date" placeholder="departure date" required/></br>
+            copy the departure time from the search result here:
+            <input type="text" name = "d_time" placeholder="departure time" required/></br>
+            copy the flight number from the search result here:
+            <input type="text" name = "flightNum" placeholder="flight number" required/></br>
+            <input type="submit" value = purchase />
+            {% if error %}
+                <p class="error"><strong>Error:</strong> {{error}}</p>
+            {% endif %}
+        </form>
+
+    {% endif %}
+
     <a href="/publicCheck">Go back to public service page</a>
 </body>
 </html>
