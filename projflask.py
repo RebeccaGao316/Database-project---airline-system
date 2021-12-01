@@ -309,7 +309,7 @@ def purchaseTicket():
     #cursor used to send queries
     cursor = conn.cursor()
     #executes query
-    query = 'select count(*) from ticket natural join flight ' \
+    query = 'select count(*) as number_seat from ticket natural join flight ' \
             'where flight_num = %s and airline_name = %s and d_date = %s and d_time = %s '
     #stores the results in a variable
     cursor.execute(query,(flightNum,airlineName,departureDate,departureTime))
@@ -318,13 +318,23 @@ def purchaseTicket():
             'where flight_num = %s and airline_name = %s and d_date = %s and d_time = %s '
     cursor.execute(query,(flightNum,airlineName,departureDate,departureTime))
     totalNum = cursor.fetchone();
-    if(currentSell == totalNum):
+    query = 'select base_price from flight ' \
+            'where flight_num = %s and airline_name = %s and d_date = %s and d_time = %s '
+    cursor.execute(query,(flightNum,airlineName,departureDate,departureTime))
+    basePrice = cursor.fetchone();
+    basePrice = float(basePrice["base_price"])
+    if(float(currentSell["number_seat"]) == float(totalNum["number_seat"])):
         return render_template('404.html')
+    if(float(currentSell["number_seat"]) > 0.75 * float(totalNum["number_seat"])):
+        price = 1.25*basePrice
+    else:
+        price = basePrice
+
     #query = 'INSERT INTO ticket (card_type,card_num,expire_date,purchase_date,' \
     #        'purchase_time,airline_name,d_date, d_time,flight_num,customer_email,sold_price,tID)'\
      #       'VALUES (%s,%s,%s,date.today(),datetime.now(),%s,%s,%s,%s,%s,100,20)'
-    query = 'INSERT INTO ticket VALUES ("1",20,%s,%s,%s, null,null,%s,%s,%s,%s,%s)'
-    cursor.execute(query,(cardType,cardNum,expDate,airlineName,departureDate,departureTime,flightNum,username))
+    query = 'INSERT INTO ticket VALUES ((select (MAX(tID)+1) from ticket as t),%s,%s,%s,%s, current_date(),current_time() ,%s,%s,%s,%s,%s)'
+    cursor.execute(query,(price,cardType,cardNum,expDate,airlineName,departureDate,departureTime,flightNum,username))
     conn.commit()
     cursor.close()
     return render_template('purchaseDone.html')
