@@ -385,6 +385,86 @@ def rateAndComment():
     cursor.close()
     return render_template('customerRate.html')
 
+@app.route('/spendingPastYear', methods=['GET', 'POST'])
+def spendingPastYear():
+
+    username = session['username']
+
+    #cursor used to send queries
+    cursor = conn.cursor()
+    #executes query
+    query = ' select sum(sold_price) as sumPrice from ticket ' \
+            'where customer_email  = %s and (purchase_date > current_date() - interval 1 year) '
+    cursor.execute(query, username)
+    #stores the results in a variable
+    data1 = cursor.fetchall()
+    for each in data1:
+        print(each)
+    cursor.close()
+    return render_template('customerSpending.html', username=username, posts1=data1)
+
+
+@app.route('/spendingInRange', methods=['GET', 'POST'])
+def spendingInRange():
+
+    username = session['username']
+    beginDate = request.form['beginDate']
+    endDate = request.form['endDate']
+    #cursor used to send queries
+    cursor = conn.cursor()
+    #executes query
+    query = ' select sum(sold_price) as sumPrice from ticket ' \
+            'where customer_email  = %s and purchase_date >= %s and purchase_date <= %s '
+    cursor.execute(query, (username,beginDate,endDate))
+    #stores the results in a variable
+    data1 = cursor.fetchall()
+    for each in data1:
+        print(each)
+    cursor.close()
+    return render_template('customerSpending.html', username=username, posts2=data1)
+
+
+@app.route('/spendingChartDefault', methods=['GET', 'POST'])
+def spendingChartDefault():
+
+    username = session['username']
+    #cursor used to send queries
+    cursor = conn.cursor()
+    #executes query
+    query = ' select month(purchase_date) as m, year(purchase_date) as y, sum(sold_price) as sumPrice ' \
+            'from ticket ' \
+            'where customer_email  = %s ' \
+            'group by month(purchase_date), year(purchase_date)'
+    cursor.execute(query, (username))
+    #stores the results in a variable
+    data1 = cursor.fetchall()
+    for each in data1:
+        print(each)
+    cursor.close()
+    return render_template('customerSpending.html', username=username, posts3=data1)
+
+@app.route('/spendingChartInRange', methods=['GET', 'POST'])
+def spendingChartInRange():
+
+    username = session['username']
+    #cursor used to send queries
+    cursor = conn.cursor()
+    beginDate = request.form['beginDate']
+    endDate = request.form['endDate']
+    #executes query
+    query = ' select month(purchase_date) as m, year(purchase_date) as y, sum(sold_price) as sumPrice ' \
+            'from ticket ' \
+            'where customer_email  = %s and purchase_date >= %s and purchase_date <= %s' \
+            'group by month(purchase_date), year(purchase_date)'
+    cursor.execute(query, (username,beginDate,endDate))
+    #stores the results in a variable
+    data1 = cursor.fetchall()
+    for each in data1:
+        print(each)
+    cursor.close()
+    return render_template('customerSpending.html', username=username, posts4=data1)
+
+
 @app.route('/logout')
 def logout():
     session.pop('username')

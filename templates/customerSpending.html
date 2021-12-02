@@ -6,9 +6,94 @@
 
 <body>
     <h1>this is the page for customers to check their spendings</h1>
+In this page, you will be able to look for 4 things. You can only one function at a time.<br>
+    1.The total amount of spending in the past year(365 days period).<br>
+    2.The total amount of spending in a given range.<br>
+    3.The monthly spending for past 6 month in a table.<br>
+    4.The monthly spending for a given range in a table.<br>
+
+    <h2>
+        The total amount of spending in the past year(365 days period).
+    </h2>
+    <form action="/spendingPastYear" method="POST">
+        <input type="submit" value = spendingInThePastYear />
+    </form>
+    <table>
+        <th>total cost in the past year</th>
+        {% for line in posts1 %}
+            <tr>
+                <td>{{line['sumPrice']}}</td>
+            </tr>
+        {% endfor %}
+    </table>
 
 
-    
+    <br><br><br>
+
+
+    <h2>
+        The monthly spending for past 6 month in a table.
+    </h2>
+    <form action="/spendingChartDefault" method="POST">
+        <input type="submit" value = spendingChartDefault />
+    </form>
+    <table>
+        <th>year</th>
+        <th>month</th>
+        <th>total cost in this period</th>
+        {% for line in posts3 %}
+            <tr>
+                <td>{{line['y']}}</td>
+                <td>{{line['m']}}</td>
+                <td>{{line['sumPrice']}}</td>
+            </tr>
+        {% endfor %}
+    </table>
+
+    <br><br><br>
+
+    <h2>
+        The total amount of spending in a given range.
+    </h2>
+    <form action="/spendingInRange" method="POST">
+        <input type="date" name = "beginDate" placeholder="begin date" required/></br>
+        <input type="date" name = "endDate" placeholder="end Date" required/></br>
+        <input type="submit" value = spendingInPeriod />
+    </form>
+    <table>
+        <th>total cost in the given range</th>
+        {% for line in posts2 %}
+            <tr>
+                <td>{{line['sumPrice']}}</td>
+            </tr>
+        {% endfor %}
+    </table>
+
+    <br><br><br>
+    <h2>
+        The monthly spending for the range in a table.
+    </h2>
+    <form action="/spendingChartInRange" method="POST">
+        <input type="date" name = "beginDate" placeholder="begin date" required/></br>
+        <input type="date" name = "endDate" placeholder="end Date" required/></br>
+        <input type="submit" value = spendingChartInRange />
+    </form>
+    <table>
+        <th>year</th>
+        <th>month</th>
+        <th>total cost in this period</th>
+        {% for line in posts4 %}
+            <tr>
+                <td>{{line['y']}}</td>
+                <td>{{line['m']}}</td>
+                <td>{{line['sumPrice']}}</td>
+            </tr>
+        {% endfor %}
+    </table>
+
+
+    <br><br><br>
+
     <a href="/customerHome">Go back to home</a>
 
 </body>
