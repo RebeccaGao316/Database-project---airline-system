@@ -12,9 +12,9 @@ customer:
 
 
 airline staff:
-10. view flight
-11. create  new flight
-12.change status of flight
+10. view flight 
+11. create new flight -- need constraint
+12.change status of flight -- need constraint
 13. add airplane in the system
 14.add airport in the system
 15. view flight ratings
@@ -26,3 +26,9 @@ airline staff:
 
 edit of database
 1.in ticket, tID->int 
+
+anthony:
+#1 create flight, go back 到了public home
+#2 create flight, base price输入的不是number，需要convert
+#3 create flight,  如何自动获取staff airline name
+#4 create flight, 日期的placeholder没法显示

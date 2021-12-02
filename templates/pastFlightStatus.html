@@ -10,7 +10,7 @@ airline name and flight number is required.
 You can also add arrival date and departure date for more specific search.
 
     <form action="/statusSearchProcess" method="POST">
-        Enter the airline name airport here:
+        Enter the airline name here:
 
         <input type="text" name = "airlineName" placeholder="airline name" required/> </br>
         Enter the flight number here:
@@ -19,7 +19,7 @@ You can also add arrival date and departure date for more specific search.
         Enter the arrival date here:
 
         <input type="date" name = "arrivalDate" placeholder="arrival date" required/></br>
-        Enter the departure airport here:
+        Enter the departure date here:
 
         <input type="date" name = "departureDate" placeholder="departure date" required/></br>
 
@@ -35,7 +35,7 @@ You can also add arrival date and departure date for more specific search.
         <th>departure date</th>
         <th>flight number</th>
         <th>status</th>
-        <th>arrival time</th>
+        <th>departure time</th>
 
     
     {% for line in posts %}
@@ -44,6 +44,7 @@ You can also add arrival date and departure date for more specific search.
             <td>{{line['d_date']}}</td>
             <td>{{line['flight_num']}}</td>            
             <td>{{line['status']}}</td>
+            <td>{{line['d_time']}}</td>
         </tr>
     {% endfor %}
     </table>

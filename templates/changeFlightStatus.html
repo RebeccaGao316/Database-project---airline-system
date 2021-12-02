@@ -1,0 +1,18 @@
+<html>
+<head>
+</head>
+<body>
+    <h1>Change Flight Status</h1>
+<form action="/changeFlightStatusInfo" method="POST">
+	<input type="text" name = "flight_number" placeholder="flight_number" required/></br>
+    	<input type="text" name = "new_status" placeholder="new_status" required/></br>
+
+	<input type="submit" value = Change />
+	{% if error %}
+		<p class="error"><strong>Error:</strong> {{error}}</p>
+	{% endif %}
+</form>
+
+<a href="/">Go back</a>
+</body>
+</html>

@@ -11,7 +11,6 @@ conn = pymysql.connect(host='localhost',
                        db='air_ticket_system',
                        charset='utf8mb4',
                        cursorclass=pymysql.cursors.DictCursor)
-
 @app.route('/')
 def hello():
     return render_template('publicHomepage.html')
@@ -199,8 +198,9 @@ def staffLoginAuth():
 
 @app.route('/flightSearchProcess', methods=['GET', 'POST'])
 def flightSearchProcess():
+    if(session.get('username') == True):
+        username = session['username']
 
-    username = session['username']
 
     #grabs information from the forms
     dep_date = request.form['dep_date']
@@ -220,7 +220,9 @@ def flightSearchProcess():
     for each in data1:
         print(each)
     cursor.close()
-    return render_template('flightSearch.html', username=username, posts=data1)
+    if(session.get('username') == True):
+        return render_template('flightSearch.html', username=username, posts=data1)
+    return render_template('flightSearch.html',  posts=data1)
 
 @app.route('/roundFlightSearchProcess', methods=['GET', 'POST'])
 def roundFlightSearchProcess():
@@ -253,8 +255,8 @@ def roundFlightSearchProcess():
 
 @app.route('/statusSearchProcess', methods=['GET', 'POST'])
 def statusSearchProcess():
-
-    username = session['username']
+    if(session.get('username') == True):
+        username = session['username']
 
     #grabs information from the forms
     airlineName = request.form['airlineName']
@@ -273,7 +275,9 @@ def statusSearchProcess():
     for each in data1:
         print(each)
     cursor.close()
-    return render_template('pastFlightStatus.html', username=username, posts=data1)
+    if(session.get('username') == True):
+        return render_template('pastFlightStatus.html', username=username, posts=data1)
+    return render_template('pastFlightStatus.html', posts=data1)
 
 
 @app.route('/checkFutureFlights', methods=['GET', 'POST'])
@@ -283,7 +287,7 @@ def checkFutureFlights():
     #cursor used to send queries
     cursor = conn.cursor()
     #executes query
-    query = 'select * from ticket where customer_email = %s and d_date > CURRENT_DATE or (d_date = current_date and d_time > current_time)'
+    query = 'select * from ticket where customer_email = %s and d_date > current_date or (d_date = current_date and d_time > current_time)'
     #stores the results in a variable
     cursor.execute(query,(username))
     data1 = cursor.fetchall()
@@ -463,6 +467,66 @@ def spendingChartInRange():
         print(each)
     cursor.close()
     return render_template('customerSpending.html', username=username, posts4=data1)
+
+@app.route('/createFlight')
+def createFlight():
+    return render_template('createFlight.html')
+
+@app.route('/changeFlightStatus')
+def changeFlightStatus():
+    return render_template('changeFlightStatus.html')
+
+@app.route('/createFlightInfo', methods=['GET', 'POST'])
+def createFlightInfo():
+    airline_name = request.form['airline_name']
+    d_date = request.form['departure_date']
+    d_time = request.form['departure_time']
+    flight_num = request.form['flight_number']
+    a_date = request.form['arrival_date']
+    a_time = request.form['arrival_time']
+    base_price = request.form['base_ticket_price']
+    status = request.form['status']
+    airplane_i_num = request.form['airplane_identification_number']
+    arr_code = request.form['arrival_airport_code']
+    dep_code = request.form['departure_airport_code']
+
+    cursor = conn.cursor()
+    query = 'SELECT * FROM flight Where airline_name = %s and d_date = %s and d_time = %s and flight_num = %s and status = %s'
+    cursor.execute(query,(airline_name, d_date, d_time, flight_num, status))
+    data = cursor.fetchone()
+    error = None
+
+    if(data):
+        error = "This flight already exists"
+        return render_template('createFlight.html', error = error)
+    else:
+        ins = 'INSERT INTO flight VALUES(%s, %s, %s, %s, %s, %s, %d, %s, %s, %s, %s)'
+        cursor.execute(ins, (airline_name, d_date, d_time, flight_num, a_date, a_time, int(base_price), status, airplane_i_num, arr_code, dep_code))
+        conn.commit()
+        cursor.close()
+        return render_template('staffHome.html')
+
+@app.route('/changeFlightStatusInfo', methods=['GET', 'POST'])
+def changeFlightStatusInfo():
+    flight_num = request.form['flight_number']
+    new_status = request.form['new_status']
+
+    cursor = conn.cursor()
+    query = 'SELECT * FROM flight WHERE flight_num = %s'
+    cursor.execute(query, (flight_num))
+    data = cursor.fetchone()
+    error = None
+
+    if(data):
+        ins = 'UPDATE flight SET status = %s WHERE flight_num = %s'
+        cursor.execute(ins,(new_status, flight_num))
+        conn.commit()
+        cursor.close()
+        return render_template('staffHome.html')
+    else:
+        error = "This flight does not exist"
+        return render_template('changeFlightStatus.html', error = error)
+
 
 
 @app.route('/logout')
