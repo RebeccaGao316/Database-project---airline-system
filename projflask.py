@@ -93,6 +93,9 @@ def moneyTrack():
     return render_template('customerSpending.html')
 
 
+@app.route('/addAirport')
+def addAirport():
+    return render_template('addAirport.html')
 
 #Authenticates the register
 #the username is a email
@@ -664,6 +667,28 @@ def revenueYear():
         print(each)
     cursor.close()
     return render_template('staffViewRevenue.html', username=username, posts2=data1)
+
+
+@app.route('/addAirportInfo', methods=['GET', 'POST'])
+def addAirportInfo():
+    code = request.form['airport_code']
+    name = request.form['airport_name']
+    city = request.form['airport_city']
+
+    cursor= conn.cursor()
+    query = 'SELECT * FROM airport where code = %s'
+    cursor.execute(query,(code))
+
+    data = cursor.fetchone()
+
+    if(data):
+        return render_template('addAirport.html', error = 'Airport already exists')
+    else:
+        ins = 'INSERT into airport VALUES(%s, %s, %s)'
+        cursor.execute(ins, (code, name, city))
+        conn.commit()
+        cursor.close()
+        return render_template('staffHome.html')
 
 @app.route('/logout')
 def logout():

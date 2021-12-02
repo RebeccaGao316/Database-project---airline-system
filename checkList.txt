@@ -25,7 +25,7 @@ airline staff:
 17.view reports
 18.view revenue -done
 19.view top destinations - done
-20. staff logout
+20. staff logout - done
 
 edit of database
 1.in ticket, tID->int 
