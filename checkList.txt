@@ -5,10 +5,12 @@ public:
 
 customer:
 4.view flights - done
-5+6.search for flight and purchase - done
+5+6.search for flight and purchase - possibly purchase on the round trip page
 7.rate and comment - done
-8.track spending - /
+8.track spending - done
 9. customer logout - done
+
+
 airline staff:
 10. view flight
 11. create  new flight
