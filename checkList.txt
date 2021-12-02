@@ -23,7 +23,7 @@ airline staff:
 15. view flight ratings
 16.view frequency customer
 17.view reports
-18.view revenue
+18.view revenue -done
 19.view top destinations - done
 20. staff logout
 

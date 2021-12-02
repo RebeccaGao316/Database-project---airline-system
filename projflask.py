@@ -66,6 +66,9 @@ def viewTopDes():
 def viewRevenue():
     return render_template('staffViewRevenue.html')
 
+@app.route('/addAirplane')
+def addAirplane():
+    return render_template('addAirplane.html')
 
 @app.route('/customerHome')
 def customerHome():
@@ -540,6 +543,51 @@ def changeFlightStatusInfo():
     else:
         error = "This flight does not exist"
         return render_template('changeFlightStatus.html', error = error)
+
+
+
+@app.route('/addAirplaneInfo', methods=['GET', 'POST'])
+def addAirplaneInfo():
+    username = session['username']
+    iden_num = request.form['Identification_number']
+    number_seat = request.form['number_of_seats']
+
+    cursor = conn.cursor()
+    query = 'SELECT airline_name FROM staff where username = %s'
+    cursor.execute(query,(username))
+    data = cursor.fetchone()
+
+    query2 = 'SELECT * FROM airplane where iden_num = %s and airline_name = %s'
+    cursor.execute(query2, (iden_num, 'China Eastern'))
+    data2 = cursor.fetchone()
+
+    if(data2):
+        return render_template('addAirplane.html', error = 'airplane already exists')
+    else:
+        ins = 'INSERT into airplane VALUES(%s, %s, %s)'
+        cursor.execute(ins,(iden_num, 'China Eastern', number_seat))
+        conn.commit()
+        cursor.close()
+        return render_template('addAirplaneSuccess.html')
+
+@app.route('/addAirplaneSuccess', methods=['GET', 'POST'])
+def addAirplaneSuccess():
+    username = session['username']
+    cursor = conn.cursor()
+
+    #query = 'SELECT airline_name FROM staff where username = %s'
+    #cursor.execute(query,(username))
+    #data = cursor.fetchone()
+
+    query2 = 'SELECT * FROM airplane where airline_name = %s'
+    cursor.execute(query2, ('China Eastern'))
+
+    data2 = cursor.fetchall()
+    for each in data2:
+        print(each)
+    cursor.close()
+    return render_template('addAirplaneSuccess.html', username=username, postsa=data2)
+
 
 @app.route('/popularThreeMonth', methods=['GET', 'POST'])
 def popularThreeMonth():

@@ -1,0 +1,28 @@
+<html>
+<head>
+</head>
+
+<body>
+<form action="/addAirplaneSuccess" method="POST">
+
+
+    <input type="submit" value = checkOperation />
+
+</form>
+    <table>
+        <th>identification_number</th>
+	<th>number_of_seat</th>
+	<th>airline_name</th>
+        {% for line in postsa %}
+            <tr>
+		<td>{{line['iden_num']}}</td>
+		<td>{{line['number_seat']}}</td>
+                 <td>{{line['airline_name']}}</td>
+            </tr>
+        {% endfor %}
+    </table>
+
+    <a href="/staffHome">Go back to home</a>
+
+</body>
+</html>
