@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>view ticket report</title>
+</head>
+<body>
+    <h1>this is the page for staff to view ticket report</h1>
+    In this page, you will be able to look for 3 things. You can only one function at a time.<br>
+    1.The total amount of tickets in the past year(365 days period).<br>
+    2.The total amount of tickets in the last month(365 days period).<br>
+    3.The total amount of tickets in a given range.<br>
+
+
+    <h2>
+        1.The total amount of tickets in the past year(365 days period).
+    </h2>
+    <form action="/ticketYearReport" method="POST">
+        <input type="submit" value = YearReport />
+    </form>
+    <table>
+        <th>total amount of tickets</th>
+
+        {% for line in posts1 %}
+            <tr>
+                <td>{{line['num']}}</td>
+            </tr>
+        {% endfor %}
+    </table>
+
+
+
+    <h2>
+        This is the table for (1).
+    </h2>
+    <table>
+        <th>year</th>
+        <th>month</th>
+        <th>total tickets in this period</th>
+        {% for line in chart1 %}
+            <tr>
+                <td>{{line['y']}}</td>
+                <td>{{line['m']}}</td>
+                <td>{{line['num']}}</td>
+            </tr>
+        {% endfor %}
+    </table>
+
+    <br><br><br>
+
+    <h2>
+        2.The total amount of tickets in the last month(365 days period).
+    </h2>
+    <form action="/ticketMonthReport" method="POST">
+        <input type="submit" value = MonthReport />
+    </form>
+    <table>
+        <th>total amount of tickets</th>
+
+        {% for line in posts2 %}
+            <tr>
+                <td>{{line['num']}}</td>
+            </tr>
+        {% endfor %}
+    </table>
+
+    <h2>
+        This is the table for (2).
+    </h2>
+    <table>
+        <th>year</th>
+        <th>month</th>
+        <th>total tickets in this period</th>
+        {% for line in chart2 %}
+            <tr>
+                <td>{{line['y']}}</td>
+                <td>{{line['m']}}</td>
+                <td>{{line['num']}}</td>
+            </tr>
+        {% endfor %}
+    </table>
+
+    <br><br><br>
+
+
+    <h2>
+        3.The total amount of tickets in a given range.
+    </h2>
+    <form action="/ticketRangeReport" method="POST">
+        <input type="date" name = "beginDate" placeholder="begin Date" required/></br>
+        <input type="date" name = "endDate" placeholder="end Date" required/></br>
+
+        <input type="submit" value = RangeReport />
+    </form>
+    <table>
+        <th>total amount of tickets</th>
+
+        {% for line in posts3 %}
+            <tr>
+                <td>{{line['num']}}</td>
+            </tr>
+        {% endfor %}
+    </table>
+
+    <h2>
+        This is the table for (3).
+    </h2>
+    <table>
+        <th>year</th>
+        <th>month</th>
+        <th>total tickets in this period</th>
+        {% for line in chart3 %}
+            <tr>
+                <td>{{line['y']}}</td>
+                <td>{{line['m']}}</td>
+                <td>{{line['num']}}</td>
+            </tr>
+        {% endfor %}
+    </table>
+
+
+    <br><br><br>
+</body>
+</html>

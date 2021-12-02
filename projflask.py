@@ -92,6 +92,9 @@ def flightRate():
 def moneyTrack():
     return render_template('customerSpending.html')
 
+@app.route('/viewReports')
+def viewReports():
+    return render_template('viewTicketReport.html')
 
 @app.route('/addAirport')
 def addAirport():
@@ -138,7 +141,7 @@ def staffRegisterAuth():
     #cursor used to send queries
     cursor = conn.cursor()
     #executes query
-    query = 'SELECT * FROM staff WHERE username = %s'
+    query = 'SELECT * FROM staff WHERE username = md5(%s)'
     cursor.execute(query, (username))
     #stores the results in a variable
     data = cursor.fetchone()
@@ -194,7 +197,7 @@ def staffLoginAuth():
     #cursor used to send queries
     cursor = conn.cursor()
     #executes query
-    query = 'SELECT * FROM staff WHERE username = %s and password = %s'
+    query = 'SELECT * FROM staff WHERE username = %s and password = md5(%s)'
     cursor.execute(query, (username, password))
     #stores the results in a variable
     data = cursor.fetchone()
@@ -558,17 +561,18 @@ def addAirplaneInfo():
     cursor = conn.cursor()
     query = 'SELECT airline_name FROM staff where username = %s'
     cursor.execute(query,(username))
-    data = cursor.fetchone()
+    airline_name = cursor.fetchone()
+    airline_name = airline_name['airline_name']
 
     query2 = 'SELECT * FROM airplane where iden_num = %s and airline_name = %s'
-    cursor.execute(query2, (iden_num, 'China Eastern'))
+    cursor.execute(query2, (iden_num, airline_name))
     data2 = cursor.fetchone()
 
     if(data2):
         return render_template('addAirplane.html', error = 'airplane already exists')
     else:
         ins = 'INSERT into airplane VALUES(%s, %s, %s)'
-        cursor.execute(ins,(iden_num, 'China Eastern', number_seat))
+        cursor.execute(ins,(iden_num, airline_name, number_seat))
         conn.commit()
         cursor.close()
         return render_template('addAirplaneSuccess.html')
@@ -578,12 +582,13 @@ def addAirplaneSuccess():
     username = session['username']
     cursor = conn.cursor()
 
-    #query = 'SELECT airline_name FROM staff where username = %s'
-    #cursor.execute(query,(username))
-    #data = cursor.fetchone()
+    query = 'SELECT airline_name FROM staff where username = %s'
+    cursor.execute(query,(username))
+    airline_name = cursor.fetchone()
+    airline_name = airline_name['airline_name']
 
     query2 = 'SELECT * FROM airplane where airline_name = %s'
-    cursor.execute(query2, ('China Eastern'))
+    cursor.execute(query2, (airline_name))
 
     data2 = cursor.fetchall()
     for each in data2:
@@ -689,6 +694,94 @@ def addAirportInfo():
         conn.commit()
         cursor.close()
         return render_template('staffHome.html')
+
+
+@app.route('/ticketYearReport', methods=['GET', 'POST'])
+def ticketYearReport():
+
+    username = session['username']
+
+    #cursor used to send queries
+    cursor = conn.cursor()
+    #executes query
+    query = ' select count(*) as num  from ticket ' \
+            'where purchase_date > current_date() - interval 1 year and airline_name = ' \
+            '(select airline_name from staff where username = %s)'
+    cursor.execute(query,(username))
+    #stores the results in a variable
+    data1 = cursor.fetchall()
+    query = ' select month(purchase_date) as m, year(purchase_date) as y, count(*) as num ' \
+            'from ticket ' \
+            'where purchase_date > current_date() - interval 1 year and airline_name = (select airline_name from staff where username = %s)' \
+            'group by month(purchase_date), year(purchase_date)'
+    cursor.execute(query,(username))
+    #stores the results in a variable
+    data2 = cursor.fetchall()
+
+    for each in data1:
+        print(each)
+    for each in data2:
+        print(each)
+    cursor.close()
+    return render_template('viewTicketReport.html', username=username, posts1=data1, chart1 = data2)
+
+@app.route('/ticketMonthReport', methods=['GET', 'POST'])
+def ticketMonthReport():
+
+    username = session['username']
+
+    #cursor used to send queries
+    cursor = conn.cursor()
+    #executes query
+    query = ' select count(*) as num  from ticket ' \
+            'where purchase_date > current_date() - interval 1 month and airline_name = ' \
+            '(select airline_name from staff where username = %s)'
+    cursor.execute(query,(username))
+    #stores the results in a variable
+    data1 = cursor.fetchall()
+    query = ' select month(purchase_date) as m, year(purchase_date) as y, count(*) as num ' \
+            'from ticket ' \
+            'where purchase_date > current_date() - interval 1 month and airline_name = (select airline_name from staff where username = %s)' \
+            'group by month(purchase_date), year(purchase_date)'
+    cursor.execute(query,(username))
+    #stores the results in a variable
+    data2 = cursor.fetchall()
+    for each in data1:
+        print(each)
+    for each in data2:
+        print(each)
+    cursor.close()
+    return render_template('viewTicketReport.html', username=username, posts2=data1, chart2 = data2)
+
+@app.route('/ticketRangeReport', methods=['GET', 'POST'])
+def ticketRangeReport():
+
+    username = session['username']
+    begin_date = request.form['beginDate']
+    end_date = request.form['endDate']
+    #cursor used to send queries
+    cursor = conn.cursor()
+    #executes query
+    query = ' select count(*) as num from ticket ' \
+            'where purchase_date >= %s and  purchase_date <= %s and airline_name = ' \
+            '(select airline_name from staff where username = %s)'
+    cursor.execute(query,(begin_date, end_date, username))
+    #stores the results in a variable
+    data1 = cursor.fetchall()
+    query = ' select month(purchase_date) as m, year(purchase_date) as y, count(*) as num ' \
+            'from ticket ' \
+            'where purchase_date >= %s and  purchase_date <= %s and airline_name = (select airline_name from staff where username = %s)' \
+            'group by month(purchase_date), year(purchase_date)'
+    cursor.execute(query,(begin_date, end_date, username))
+    #stores the results in a variable
+    data2 = cursor.fetchall()
+    for each in data1:
+        print(each)
+    for each in data2:
+        print(each)
+    cursor.close()
+    return render_template('viewTicketReport.html', username=username, posts3=data1, chart3 = data2)
+
 
 @app.route('/logout')
 def logout():
