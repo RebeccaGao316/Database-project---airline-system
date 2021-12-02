@@ -58,6 +58,15 @@ def pastFlightStatus():
 def staffHome():
     return render_template('staffHome.html')
 
+@app.route('/viewTopDes')
+def viewTopDes():
+    return render_template('topDest.html')
+
+@app.route('/viewRevenue')
+def viewRevenue():
+    return render_template('staffViewRevenue.html')
+
+
 @app.route('/customerHome')
 def customerHome():
     return render_template('customerHome.html')
@@ -532,7 +541,81 @@ def changeFlightStatusInfo():
         error = "This flight does not exist"
         return render_template('changeFlightStatus.html', error = error)
 
+@app.route('/popularThreeMonth', methods=['GET', 'POST'])
+def popularThreeMonth():
 
+    username = session['username']
+
+    #cursor used to send queries
+    cursor = conn.cursor()
+    #executes query
+    query = 'select dep_airport_code, (select city from airport where code = dep_airport_code) as city ' \
+            'from ticket natural join flight ' \
+            'where d_date > current_date() - interval 3 month ' \
+            'group by dep_airport_code ' \
+            'order by count(*) desc limit 3'
+    cursor.execute(query)
+    #stores the results in a variable
+    data1 = cursor.fetchall()
+    for each in data1:
+        print(each)
+    cursor.close()
+    return render_template('topDest.html', username=username, posts1=data1)
+
+@app.route('/popularYear', methods=['GET', 'POST'])
+def popularYear():
+
+    username = session['username']
+
+    #cursor used to send queries
+    cursor = conn.cursor()
+    #executes query
+    query = 'select dep_airport_code, (select city from airport where code = dep_airport_code) as city ' \
+            'from ticket natural join flight ' \
+            'where d_date > current_date() - interval 1 year ' \
+            'group by dep_airport_code ' \
+            'order by count(*) desc limit 3'
+    cursor.execute(query)
+    #stores the results in a variable
+    data1 = cursor.fetchall()
+    for each in data1:
+        print(each)
+    cursor.close()
+    return render_template('topDest.html', username=username, posts2=data1)
+
+@app.route('/revenueMonth', methods=['GET', 'POST'])
+def revenueMonth():
+
+    username = session['username']
+
+    #cursor used to send queries
+    cursor = conn.cursor()
+    #executes query
+    query = 'select sum(sold_price) as revenue from ticket where purchase_date > current_date() - interval 1 month'
+    cursor.execute(query)
+    #stores the results in a variable
+    data1 = cursor.fetchall()
+    for each in data1:
+        print(each)
+    cursor.close()
+    return render_template('staffViewRevenue.html', username=username, posts1=data1)
+
+@app.route('/revenueYear', methods=['GET', 'POST'])
+def revenueYear():
+
+    username = session['username']
+
+    #cursor used to send queries
+    cursor = conn.cursor()
+    #executes query
+    query = 'select sum(sold_price) as revenue from ticket where purchase_date > current_date() - interval 1 year'
+    cursor.execute(query)
+    #stores the results in a variable
+    data1 = cursor.fetchall()
+    for each in data1:
+        print(each)
+    cursor.close()
+    return render_template('staffViewRevenue.html', username=username, posts2=data1)
 
 @app.route('/logout')
 def logout():

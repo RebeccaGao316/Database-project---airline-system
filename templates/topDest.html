@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>View Top Destination</title>
+</head>
+<body>
+<h1>In this page, a staff can view top destination</h1>
+There are 2 functions provides<br>
+1.The staff can find 3 most popular destinations for last 3 months<br>
+2.The staff can find 3 most popular destinations for last year<br><br><br>
+<h2>Popular in 3 months </h2>
+<form action="/popularThreeMonth" method="POST">
+    <input type="submit" value = checkPopular3Months />
+</form>
+<table>
+    <th>top popular(desc!</th>
+    {% for line in posts1 %}
+        <tr>
+            <td>{{line['city']}}</td>
+        </tr>
+    {% endfor %}
+</table>
+
+
+<br><br><br>
+
+<h2>Popular in last year </h2>
+<form action="/popularYear" method="POST">
+    <input type="submit" value = checkPopularLastYear />
+</form>
+<table>
+    <th>top popular(desc!</th>
+    {% for line in posts2 %}
+        <tr>
+            <td>{{line['city']}}</td>
+        </tr>
+    {% endfor %}
+</table>
+</body>
+</html>

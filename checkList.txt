@@ -1,3 +1,5 @@
+!!!very important!! - for things related to database, even if you have already fix the code, please still remain it in the checklist.
+
 public:
 1.view public info: - done
 2.register - done
@@ -16,14 +18,13 @@ airline staff:
 10. view flight 
 11. create new flight -- need constraint
 12.change status of flight -- need constraint
-
 13. add airplane in the system
 14.add airport in the system
 15. view flight ratings
 16.view frequency customer
 17.view reports
 18.view revenue
-19.view top destinations
+19.view top destinations - done
 20. staff logout
 
 edit of database
@@ -31,6 +32,7 @@ edit of database
 2.in staff/customer, password length -> 64
 3. in .sql file, all password with md5
 4.in airplane login, redirect to staff homepage
+5. foreign key constraint
 
 anthony:
 #1 create flight, go back 到了public home

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>view revenue for staff</title>
+</head>
+<body>
+<h1>In this page, a staff can view revenue</h1>
+There are 2 functions provides<br>
+1.The staff can view revenue for last months<br>
+2.The staff can find view revenue for last year<br><br><br>
+<h2>revenue last month </h2>
+<form action="/revenueMonth" method="POST">
+    <input type="submit" value = viewRevenueLastMonth />
+</form>
+<table>
+    <th>total revenue last month</th>
+    {% for line in posts1 %}
+        <tr>
+            <td>{{line['revenue']}}</td>
+        </tr>
+    {% endfor %}
+</table>
+
+
+<br><br><br>
+
+<h2>revenue last year </h2>
+<form action="/revenueYear" method="POST">
+    <input type="submit" value = viewRevenueLastYear />
+</form>
+<table>
+    <th>total revennue last month</th>
+    {% for line in posts2 %}
+        <tr>
+            <td>{{line['revenue']}}</td>
+        </tr>
+    {% endfor %}
+</table>
+</body>
+</html>
