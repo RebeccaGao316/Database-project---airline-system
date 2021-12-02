@@ -1,20 +1,22 @@
 public:
-1.view public info: round trip need change
+1.view public info: - done
 2.register - done
-3.login - need md5(password)
+3.login - done
 
 customer:
 4.view flights - done
-5+6.search for flight and purchase - possibly purchase on the round trip page
+5+6.search for flight and purchase - done
 7.rate and comment - done
 8.track spending - done
 9. customer logout - done
 
 
 airline staff:
+
 10. view flight 
 11. create new flight -- need constraint
 12.change status of flight -- need constraint
+
 13. add airplane in the system
 14.add airport in the system
 15. view flight ratings
@@ -26,6 +28,9 @@ airline staff:
 
 edit of database
 1.in ticket, tID->int 
+2.in staff/customer, password length -> 64
+3. in .sql file, all password with md5
+4.in airplane login, redirect to staff homepage
 
 anthony:
 #1 create flight, go back 到了public home

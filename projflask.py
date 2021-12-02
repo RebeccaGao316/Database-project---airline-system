@@ -15,11 +15,6 @@ conn = pymysql.connect(host='localhost',
 def hello():
     return render_template('publicHomepage.html')
 
-#Define route for login
-@app.route('/login')
-def login():
-    return render_template('login.html')
-
 #Define route for customer register
 @app.route('/customerRegister')
 def customerRegister():
@@ -29,10 +24,15 @@ def customerRegister():
 def staffRegister():
     return render_template('staffRegister.html')
 
+
 #Define route for customer login
-@app.route('/customerLogin')
+@app.route('/customerLogin', methods=['GET', 'POST'])
 def customerLogin():
-    return render_template('customerLogin.html')
+    print("wehere")
+    if(session.get('username')):
+        return redirect(url_for('customerHome'))
+    else:
+        return render_template('customerLogin.html')
 #Define route for staff login
 @app.route('/staffLogin')
 def staffLogin():
@@ -106,7 +106,7 @@ def customerRegisterAuth():
         error = "This user already exists"
         return render_template('register.html', error = error)
     else:
-        ins = 'INSERT INTO customer VALUES(%s, %s, %s, null,null,null, null,null,null, null,null,null)'
+        ins = 'INSERT INTO customer VALUES(%s, %s, md5(%s), null,null,null, null,null,null, null,null,null)'
         cursor.execute(ins, (username, name, password))
         conn.commit()
         cursor.close()
@@ -152,7 +152,7 @@ def customerLoginAuth():
     #cursor used to send queries
     cursor = conn.cursor()
     #executes query
-    query = 'SELECT * FROM customer WHERE email = %s and password = %s'
+    query = 'SELECT * FROM customer WHERE email = %s and password = md5(%s)'
     cursor.execute(query, (username, password))
     #stores the results in a variable
     data = cursor.fetchone()
@@ -238,20 +238,25 @@ def roundFlightSearchProcess():
     #cursor used to send queries
     cursor = conn.cursor()
     #executes query
-    query = 'SELECT * FROM flight WHERE d_date = %s ' \
+    query1 = 'SELECT * FROM flight WHERE d_date = %s ' \
             'and dep_airport_code = (select code from airport where airport.name = %s) ' \
-            'and arr_airport_code = (select code from airport where airport.name = %s)'\
-            'and exists (select * from flight where d_date = %s and ' \
+            'and arr_airport_code = (select code from airport where airport.name = %s)'
+    query2 = 'select * from flight where d_date = %s and ' \
             'dep_airport_code = (select code from airport where airport.name = %s) ' \
-            'and arr_airport_code = (select code from airport where airport.name = %s))'
+            'and arr_airport_code = (select code from airport where airport.name = %s)'
 
-    cursor.execute(query, (dep_date,dep_airport,arr_airport,return_date,arr_airport,dep_airport))
+    cursor.execute(query1, (dep_date,dep_airport,arr_airport))
     #stores the results in a variable
     data1 = cursor.fetchall()
     for each in data1:
         print(each)
+    cursor.execute(query2, (return_date,arr_airport,dep_airport))
+    #stores the results in a variable
+    data2 = cursor.fetchall()
+    for each in data2:
+        print(each)
     cursor.close()
-    return render_template('roundFlightSearch.html', username=username, posts=data1)
+    return render_template('roundFlightSearch.html', username=username, posts1=data1, posts2 = data2)
 
 @app.route('/statusSearchProcess', methods=['GET', 'POST'])
 def statusSearchProcess():
