@@ -78,6 +78,14 @@ def addAirplane():
 def customerHome():
     return render_template('customerHome.html')
 
+@app.route('/createFlight')
+def createFlight():
+    return render_template('createFlight.html')
+
+@app.route('/changeFlightStatus')
+def changeFlightStatus():
+    return render_template('changeFlightStatus.html')
+
 @app.route('/flightView')
 def flightView():
     return render_template('customerView.html')
@@ -411,14 +419,34 @@ def rateAndComment():
     departureDate = request.form['d_date']
     star = request.form['star']
     comment = request.form['comment']
+    error = None
 
 
     #cursor used to send queries
     cursor = conn.cursor()
+    #check 0 whether the info indicate a flight
+    #check 1 whether there is no comment and star for this trip
+    check0 = 'select * from ticket where customer_email = %s' \
+             ' and airline_name = %s and d_date = %s and d_time = %s ' \
+             'and flight_num = %s'
+    cursor.execute(check0,(username, airlineName,departureDate,departureTime,flightNum))
+    checkdata = cursor.fetchall()
+    if(not checkdata):
+        error = "This is not a valid flight"
+        return render_template('customerRate.html', error = error)
 
-    #query = 'INSERT INTO ticket (card_type,card_num,expire_date,purchase_date,' \
-    #        'purchase_time,airline_name,d_date, d_time,flight_num,customer_email,sold_price,tID)'\
-    #       'VALUES (%s,%s,%s,date.today(),datetime.now(),%s,%s,%s,%s,%s,100,20)'
+    check1 = 'select * from rate where customer_email = %s' \
+             ' and airline_name = %s and d_date = %s and d_time = %s ' \
+             'and flight_num = %s'
+    cursor.execute(check1,(username, airlineName,departureDate,departureTime,flightNum))
+    checkdata = cursor.fetchall()
+    if(checkdata):
+        error = "You have already rate for this!"
+        return render_template('customerRate.html', error = error)
+
+
+
+
     query = 'insert into rate VALUES(%s,%s,%s,%s,%s,%s,%s)'
     cursor.execute(query,(airlineName,departureDate,departureTime,flightNum,username,comment,star))
     conn.commit()
@@ -504,13 +532,6 @@ def spendingChartInRange():
     cursor.close()
     return render_template('customerSpending.html', username=username, posts4=data1)
 
-@app.route('/createFlight')
-def createFlight():
-    return render_template('createFlight.html')
-
-@app.route('/changeFlightStatus')
-def changeFlightStatus():
-    return render_template('changeFlightStatus.html')
 
 @app.route('/viewFutureFlights', methods=['GET', 'POST'])
 def viewFutureFlights():
