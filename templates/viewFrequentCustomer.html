@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>view frequent customer</title>
+</head>
+<body>
+    <h1>this is the page for staff to view frequent customer</h1>
+    In this page, you will be able to look for 2 things. You can only one function at a time.<br>
+    1.The most frequent customer within the last year.<br>
+    2.a list of all flights a particular Customer has taken.<br>
+
+
+
+    <h2>
+         1.The most frequent customer within the last year.
+    </h2>
+    <form action="/frequentCustomer" method="POST">
+        <input type="submit" value = ShowCustomer />
+    </form>
+    <table>
+        <th>Name</th>
+        <th>Email</th>
+        {% for line in chart1 %}
+            <tr>
+                <td>{{line['name']}}</td>
+                <td>{{line['email']}}</td>
+            </tr>
+        {% endfor %}
+    </table>
+
+
+
+
+
+    <h2>
+         2.a list of all flights a particular Customer has taken.
+    </h2>
+    <form action="/flightsCustomerTaken" method="POST">
+        <input type="text" name = "email" placeholder="user email" required/> </br>
+
+        <input type="submit" value = CheckFlights />
+    </form>
+    <table>
+        <th>Flight_num</th>
+        <th>d_date</th>
+        <th>d_date</th>
+        {% for line in chart2 %}
+            <tr>
+                <td>{{line['flight_num']}}</td>
+                <td>{{line['d_date']}}</td>
+                <td>{{line['d_time']}}</td>
+            </tr>
+        {% endfor %}
+    </table>
+
+    <h2>
+        This is the table for (2).
+    </h2>
+    <br><br><br>
+
+
+
+
+    <br><br><br>
+    <a href="/staffHome">Go back</a>
+
+</body>
+</html>

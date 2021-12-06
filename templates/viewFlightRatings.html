@@ -1,0 +1,52 @@
+<html>
+<head>
+</head>
+<body>
+<form action="/staffViewRatings" method="POST">
+	<input type="text" name = "flight_num" placeholder="flight_num" required/> </br>
+	<input type="text" name = "d_date" placeholder="d_date" required/></br>
+	<input type="text" name = "d_time" placeholder="d_time" required/></br>
+	<input type="submit" value = View />
+	<h2>
+	{% if error %}
+		<p class="error"><strong>Error:</strong> {{error}}</p>
+	{% endif %}
+	</h2>
+
+	<h2>
+		1.Average Rating
+	</h2>
+	 <table>
+        <th>Average rating</th>
+        {% for line in posts1 %}
+            <tr>
+                <td>{{line['num']}}</td>
+            </tr>
+        {% endfor %}
+    </table>
+
+
+	<h2>
+		2.All stars and comments
+	</h2>
+	<table>
+        <th>Star</th>
+        <th>Comment</th>
+        {% for line in chart1 %}
+            <tr>
+                <td>{{line['star']}}</td>
+                <td>{{line['comment']}}</td>
+            </tr>
+        {% endfor %}
+    </table>
+
+
+</form>
+
+<a href="/staffHome">Go back</a>
+
+</body>
+
+
+</html>
+

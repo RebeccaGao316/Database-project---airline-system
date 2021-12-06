@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>view flights</title>
+</head>
+<body>
+    <h1>this is the page for staff to view flights</h1>
+    In this page, you will be able to look for 3 things. You can only one function at a time.<br>
+    1.All the future flights in the next 30 days.<br>
+    2.All the current/future/past flights based range of dates, source/destination airports/city etc.<br>
+    3.All the customers of a particular flight.<br>
+
+
+    <h2>
+        1.All the future flights in the next 30 days.
+    </h2>
+    <form action="/viewFutureFlights" method="POST">
+        <input type="submit" value = FlightList />
+    </form>
+
+    <h2>
+        This is the table for (1).
+    </h2>
+    <table>
+        <th>flight_num</th>
+        <th>d_date</th>
+        <th>d_time</th>
+        {% for line in chart1 %}
+            <tr>
+                <td>{{line['flight_num']}}</td>
+                <td>{{line['d_date']}}</td>
+                <td>{{line['d_time']}}</td>
+            </tr>
+        {% endfor %}
+    </table>
+
+    <br><br><br>
+
+    <h2>
+        2.All the current/future/past flights based range of dates, source/destination airports/city etc.
+    </h2>
+    <h2>
+        Flights based range of dates
+    </h2>
+    <form action="/flightsBasedOnDate" method="POST">
+        <input type="date" name = "StartDate" placeholder="StartDate" required/></br>
+        <input type="date" name = "EndDate" placeholder="EndDate" required/></br>
+        <input type="submit" value = View /></br>
+    </form>
+    <h2>
+        This is the table for flights based range of dates.
+    </h2>
+    <table>
+        <th>flight_num</th>
+        <th>d_date</th>
+        <th>d_time</th>
+        {% for line in chart2 %}
+            <tr>
+                <td>{{line['flight_num']}}</td>
+                <td>{{line['d_date']}}</td>
+                <td>{{line['d_time']}}</td>
+            </tr>
+        {% endfor %}
+    </table>
+    <h2>
+        Flights Based on source/destination airports
+    </h2>
+
+    <form action="/flightsBasedOnLocation" method="POST">
+        <input type="text" name = "departure_airport" placeholder="departure_airport" required/></br>
+        <input type="text" name = "arrival_airport" placeholder="arrival_airport" required/></br>
+        <input type="submit" value = "View" />
+    </form>
+
+     <h2>
+        This is the table for flights based departure and arrival airport.
+    </h2>
+    <table>
+        <th>flight_num</th>
+        <th>d_date</th>
+        <th>d_time</th>
+        {% for line in chart3 %}
+            <tr>
+                <td>{{line['flight_num']}}</td>
+                <td>{{line['d_date']}}</td>
+                <td>{{line['d_time']}}</td>
+            </tr>
+        {% endfor %}
+    </table>
+
+    <br><br><br>
+
+
+    <h2>
+        3.All the customers of a particular flight.
+    </h2>
+    <form action="/customersOfFlight" method="POST">
+        <input type="text" name = "flight_num" placeholder="flight_num" required/></br>
+        <input type="date" name = "d_date" placeholder="d_date" required/></br>
+        <input type="text" name = "d_time" placeholder="d_time" required/></br>
+        <input type="submit" value = "ShowCustomers" />
+    </form>
+    <h2>
+        This is the table for (3).
+    </h2>
+    <table>
+        <th>name</th>
+        <th>email</th>
+        {% for line in chart4 %}
+            <tr>
+                <td>{{line['name']}}</td>
+                <td>{{line['email']}}</td>
+
+            </tr>
+        {% endfor %}
+    </table>
+
+
+    <br><br><br>
+</body>
+</html>

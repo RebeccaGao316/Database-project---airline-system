@@ -7,16 +7,25 @@
     <title>publicHomepage</title>
 </head>
 <body>
-    {% if not message %}
+{% if not session['username'] %}
+
 	<a href="/staffLogin">staff Login</a>
     <a href="/customerLogin">customer Login</a>
 
 
 	<a href="/staffRegister">staff Register</a>
     <a href="/customerRegister">customer Register</a>
+{% endif %}
+
+{% if session['username'] %}
+
+    <a href="/staffHome">staff homepage</a>
+    <a href="/customerHome">customer home</a>
+
+
+{% endif %}
 
     <a href="/publicCheck">public service</a>
-{% endif %}
 
 
 </body>

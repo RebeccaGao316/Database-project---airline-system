@@ -58,6 +58,10 @@ def pastFlightStatus():
 def staffHome():
     return render_template('staffHome.html')
 
+@app.route('/viewFlights')
+def viewFlights():
+    return render_template('viewFlights.html')
+
 @app.route('/viewTopDes')
 def viewTopDes():
     return render_template('topDest.html')
@@ -92,6 +96,14 @@ def flightRate():
 def moneyTrack():
     return render_template('customerSpending.html')
 
+@app.route('/viewFlightRatings')
+def viewFlightRatings():
+    return render_template('viewFlightRatings.html')
+
+@app.route('/viewFrequentCustomer')
+def viewFrequentCustomer():
+    return render_template('viewFrequentCustomer.html')
+
 @app.route('/viewReports')
 def viewReports():
     return render_template('viewTicketReport.html')
@@ -99,6 +111,7 @@ def viewReports():
 @app.route('/addAirport')
 def addAirport():
     return render_template('addAirport.html')
+
 
 #Authenticates the register
 #the username is a email
@@ -152,7 +165,7 @@ def staffRegisterAuth():
         error = "This user already exists"
         return render_template('register.html', error = error)
     else:
-        ins = 'INSERT INTO staff VALUES(%s, %s,null,null,null,%s)'
+        ins = 'INSERT INTO staff VALUES(%s, md5(%s),null,null,null,%s)'
         cursor.execute(ins, (username, password, airlineName))
         conn.commit()
         cursor.close()
@@ -499,6 +512,107 @@ def createFlight():
 def changeFlightStatus():
     return render_template('changeFlightStatus.html')
 
+@app.route('/viewFutureFlights', methods=['GET', 'POST'])
+def viewFutureFlights():
+    username = session['username']
+    # cursor used to send queries
+    cursor = conn.cursor()
+    # executes query
+    query1 = 'SELECT airline_name FROM staff WHERE username = %s'
+    cursor.execute(query1, (username))
+    airline_name = cursor.fetchone()
+    airline_name = airline_name['airline_name']
+    query2 = 'SELECT flight_num, d_date, d_time from flight WHERE airline_name = %s and d_date > current_date() and d_date < current_date () + interval 1 month ; '
+    cursor.execute(query2, (airline_name))
+    # stores the results in a variable
+    data = cursor.fetchall()
+    for each in data:
+        print(each)
+    error = None
+    cursor.close()
+    return render_template('viewFlights.html', username=username, chart1=data, error = error)
+
+@app.route('/flightsBasedOnDate', methods=['GET', 'POST'])
+def flightsBasedOnDate():
+    username = session['username']
+    start_date = request.form['StartDate']
+    end_date = request.form['EndDate']
+    # cursor used to send queries
+    cursor = conn.cursor()
+    query1 = 'SELECT airline_name FROM staff WHERE username = %s'
+    cursor.execute(query1, (username))
+    airline_name = cursor.fetchone()
+    airline_name = airline_name['airline_name']
+    # executes query
+    query2 = 'SELECT flight_num, d_date, d_time FROM flight WHERE airline_name = %s and d_date > %s and d_date < %s'
+    cursor.execute(query2, (airline_name, start_date, end_date))
+    # stores the results in a variable
+    data1 = cursor.fetchall()
+    # use fetchall() if you are expecting more than 1 data row
+    if (data1):
+        for each in data1:
+            print(each)
+        error = None
+        cursor.close()
+        return render_template('viewFlights.html', username=username, error=error, chart2=data1)
+    else:
+        return render_template('viewFLights.html', username=username, error='No flights in this period!')
+
+@app.route('/flightsBasedOnLocation', methods=['GET', 'POST'])
+def flightsBasedOnLocation():
+    username = session['username']
+    departure_airport = request.form['departure_airport']
+    arrival_airport = request.form['arrival_airport']
+    # cursor used to send queries
+    cursor = conn.cursor()
+    query1 = 'SELECT airline_name FROM staff WHERE username = %s'
+    cursor.execute(query1, (username))
+    airline_name = cursor.fetchone()
+    airline_name = airline_name['airline_name']
+    # executes query
+    query2 = 'SELECT flight_num, d_date, d_time FROM flight WHERE ' \
+             'airline_name = %s and '\
+             'dep_airport_code = (select distinct code from airport where name = %s) ' \
+             'and arr_airport_code = (select code from airport where name = %s);'
+    cursor.execute(query2, (airline_name, departure_airport, arrival_airport))
+    # stores the results in a variable
+    data1 = cursor.fetchall()
+    # use fetchall() if you are expecting more than 1 data row
+    if (data1):
+        for each in data1:
+            print(each)
+        error = None
+        cursor.close()
+        return render_template('viewFlights.html', username=username, error=error, chart3=data1)
+    else:
+        return render_template('viewFLights.html', username=username, error='No flights found!')
+
+@app.route('/customersOfFlight', methods=['GET', 'POST'])
+def customersOfFlight():
+    username = session['username']
+    flight_num = request.form['flight_num']
+    d_date = request.form['d_date']
+    d_time = request.form['d_time']
+    # cursor used to send queries
+    cursor = conn.cursor()
+    query1 = 'SELECT airline_name FROM staff WHERE username = %s'
+    cursor.execute(query1, (username))
+    airline_name = cursor.fetchone()
+    airline_name = airline_name['airline_name']
+    # executes query
+    query2 = 'SELECT DISTINCT name, email FROM customer, ticket WHERE airline_name = %s and flight_num = %s and d_date = %s and d_time = %s and email = customer_email'
+    cursor.execute(query2, (airline_name, flight_num, d_date, d_time))
+    # stores the results in a variable
+    data1 = cursor.fetchall()
+    # use fetchall() if you are expecting more than 1 data row
+    if (data1):
+        for each in data1:
+            print(each)
+        error = None
+        cursor.close()
+        return render_template('viewFlights.html', username=username, error=error, chart4=data1)
+    else:
+        return render_template('viewFLights.html', username=username, error='This flight does not exist')
 @app.route('/createFlightInfo', methods=['GET', 'POST'])
 def createFlightInfo():
     airline_name = request.form['airline_name']
@@ -604,13 +718,17 @@ def popularThreeMonth():
 
     #cursor used to send queries
     cursor = conn.cursor()
+    query1 = 'SELECT airline_name FROM staff WHERE username = %s'
+    cursor.execute(query1, (username))
+    airline_name = cursor.fetchone()
+    airline_name = airline_name['airline_name']
     #executes query
     query = 'select dep_airport_code, (select city from airport where code = dep_airport_code) as city ' \
             'from ticket natural join flight ' \
-            'where d_date > current_date() - interval 3 month ' \
+            'where d_date > current_date() - interval 3 month and airline_name = %s' \
             'group by dep_airport_code ' \
             'order by count(*) desc limit 3'
-    cursor.execute(query)
+    cursor.execute(query,airline_name)
     #stores the results in a variable
     data1 = cursor.fetchall()
     for each in data1:
@@ -625,13 +743,17 @@ def popularYear():
 
     #cursor used to send queries
     cursor = conn.cursor()
+    query1 = 'SELECT airline_name FROM staff WHERE username = %s'
+    cursor.execute(query1, (username))
+    airline_name = cursor.fetchone()
+    airline_name = airline_name['airline_name']
     #executes query
     query = 'select dep_airport_code, (select city from airport where code = dep_airport_code) as city ' \
             'from ticket natural join flight ' \
-            'where d_date > current_date() - interval 1 year ' \
+            'where d_date > current_date() - interval 1 year and airline_name = %s' \
             'group by dep_airport_code ' \
             'order by count(*) desc limit 3'
-    cursor.execute(query)
+    cursor.execute(query, airline_name)
     #stores the results in a variable
     data1 = cursor.fetchall()
     for each in data1:
@@ -646,9 +768,15 @@ def revenueMonth():
 
     #cursor used to send queries
     cursor = conn.cursor()
+    query1 = 'SELECT airline_name FROM staff WHERE username = %s'
+    cursor.execute(query1, (username))
+    airline_name = cursor.fetchone()
+    airline_name = airline_name['airline_name']
     #executes query
-    query = 'select sum(sold_price) as revenue from ticket where purchase_date > current_date() - interval 1 month'
-    cursor.execute(query)
+    query = 'select sum(sold_price) as revenue from ticket ' \
+            'where purchase_date > current_date() - interval 1 month' \
+            ' and airline_name = %s'
+    cursor.execute(query,airline_name)
     #stores the results in a variable
     data1 = cursor.fetchall()
     for each in data1:
@@ -663,9 +791,14 @@ def revenueYear():
 
     #cursor used to send queries
     cursor = conn.cursor()
+    query1 = 'SELECT airline_name FROM staff WHERE username = %s'
+    cursor.execute(query1, (username))
+    airline_name = cursor.fetchone()
+    airline_name = airline_name['airline_name']
     #executes query
-    query = 'select sum(sold_price) as revenue from ticket where purchase_date > current_date() - interval 1 year'
-    cursor.execute(query)
+    query = 'select sum(sold_price) as revenue from ticket where purchase_date > current_date() - interval 1 year' \
+            ' and airline_name = %s'
+    cursor.execute(query,airline_name)
     #stores the results in a variable
     data1 = cursor.fetchall()
     for each in data1:
@@ -673,14 +806,102 @@ def revenueYear():
     cursor.close()
     return render_template('staffViewRevenue.html', username=username, posts2=data1)
 
+@app.route('/staffViewRatings', methods=['GET', 'POST'])
+def staffViewRatings():
+    username = session['username']
+    flight_num = request.form['flight_num']
+    d_date = request.form['d_date']
+    d_time = request.form['d_time']
+    #cursor used to send queries
+    cursor = conn.cursor()
+    query1 = 'SELECT airline_name FROM staff WHERE username = %s'
+    cursor.execute(query1, (username))
+    airline_name = cursor.fetchone()
+    airline_name = airline_name['airline_name']
+    print(airline_name)
+    #executes query
+    query2 = 'SELECT avg(star) as num FROM rate WHERE airline_name = %s and flight_num = %s and d_date = %s and d_time = %s'
+    cursor.execute(query2, (airline_name, flight_num, d_date, d_time))
+    #stores the results in a variable
+    data1 = cursor.fetchall()
+    #use fetchall() if you are expecting more than 1 data row
+    query3 = 'SELECT star, comment FROM rate WHERE airline_name = %s and flight_num = %s and d_date = %s and d_time = %s '
+    cursor.execute(query3, (airline_name, flight_num, d_date, d_time))
+    data2 = cursor.fetchall()
+    if (data1 and data2):
+        for each in data1:
+            print(each)
+        for each in data2:
+            print(each)
+        error = None
+        cursor.close()
+        return render_template('viewFlightRatings.html', username = username, error= error, posts1 = data1, chart1 = data2)
+    else:
+        return render_template('viewFlightRatings.html', username = username, error = 'This flight does not exist' )
+
+
+@app.route('/frequentCustomer', methods=['GET', 'POST'])
+def frequentCustomer():
+    username = session['username']
+    # cursor used to send queries
+    cursor = conn.cursor()
+    # executes query
+    query1 = 'SELECT airline_name FROM staff WHERE username = %s'
+    cursor.execute(query1, (username))
+    airline_name = cursor.fetchone()
+    airline_name = airline_name['airline_name']
+    query2 = 'SELECT distinct name, email from customer, ticket WHERE airline_name = %s and email = customer_email and purchase_date > current_date () - interval 1 year GROUP BY customer_email ORDER BY COUNT(*) DESC LIMIT 1; '
+    cursor.execute(query2,(airline_name))
+    # stores the results in a variable
+    data = cursor.fetchall()
+    for each in data:
+        print(each)
+    cursor.close()
+    return render_template('viewFrequentCustomer.html', username=username, chart1=data)
+
+@app.route('/flightsCustomerTaken', methods=['GET', 'POST'])
+def flightsCustomerTaken():
+    username = session['username']
+    user_email = request.form['email']
+    #cursor used to send queries
+    cursor = conn.cursor()
+    #executes query
+    query1 = 'SELECT airline_name FROM staff WHERE username = %s'
+    cursor.execute(query1, (username))
+    airline_name = cursor.fetchone()
+    airline_name = airline_name['airline_name']
+    query2 = 'SELECT flight_num, d_date, d_time FROM ticket WHERE airline_name = %s and customer_email = %s;'
+    cursor.execute(query2, (airline_name, user_email))
+    #stores the results in a variable
+    data = cursor.fetchall()
+    if (data):
+        for each in data:
+            print(each)
+        cursor.close()
+        error = None
+        return render_template('viewFrequentCustomer.html', username=username, chart2 = data, error=error)
+    else:
+        return render_template('viewFrequentCustomer.html', username=username, error='This customer does not exist')
+
+
+
 
 @app.route('/addAirportInfo', methods=['GET', 'POST'])
 def addAirportInfo():
+    username = session['username']
     code = request.form['airport_code']
     name = request.form['airport_name']
     city = request.form['airport_city']
 
     cursor= conn.cursor()
+    query0 = 'select * from staff where username = %s'
+    cursor.execute(query0, (username))
+    sanityData = cursor.fetchall()
+    if(not sanityData):
+        return render_template('customerConstraint.html')
+
+
+
     query = 'SELECT * FROM airport where code = %s'
     cursor.execute(query,(code))
 
@@ -703,7 +924,9 @@ def ticketYearReport():
 
     #cursor used to send queries
     cursor = conn.cursor()
-    #executes query
+
+
+#executes query
     query = ' select count(*) as num  from ticket ' \
             'where purchase_date > current_date() - interval 1 year and airline_name = ' \
             '(select airline_name from staff where username = %s)'
