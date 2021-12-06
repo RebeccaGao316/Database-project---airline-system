@@ -538,6 +538,13 @@ def viewFutureFlights():
     username = session['username']
     # cursor used to send queries
     cursor = conn.cursor()
+    #sanity check whether the user is a staff
+    query0 = 'select * from staff where username = %s'
+    cursor.execute(query0, (username))
+    sanityData = cursor.fetchall()
+    if(not sanityData):
+        return render_template('customerConstraint.html')
+
     # executes query
     query1 = 'SELECT airline_name FROM staff WHERE username = %s'
     cursor.execute(query1, (username))
@@ -560,6 +567,12 @@ def flightsBasedOnDate():
     end_date = request.form['EndDate']
     # cursor used to send queries
     cursor = conn.cursor()
+    #sanity check whether the user is a staff
+    query0 = 'select * from staff where username = %s'
+    cursor.execute(query0, (username))
+    sanityData = cursor.fetchall()
+    if(not sanityData):
+        return render_template('customerConstraint.html')
     query1 = 'SELECT airline_name FROM staff WHERE username = %s'
     cursor.execute(query1, (username))
     airline_name = cursor.fetchone()
@@ -582,10 +595,17 @@ def flightsBasedOnDate():
 @app.route('/flightsBasedOnLocation', methods=['GET', 'POST'])
 def flightsBasedOnLocation():
     username = session['username']
+
     departure_airport = request.form['departure_airport']
     arrival_airport = request.form['arrival_airport']
     # cursor used to send queries
     cursor = conn.cursor()
+    #sanity check whether the user is a staff
+    query0 = 'select * from staff where username = %s'
+    cursor.execute(query0, (username))
+    sanityData = cursor.fetchall()
+    if(not sanityData):
+        return render_template('customerConstraint.html')
     query1 = 'SELECT airline_name FROM staff WHERE username = %s'
     cursor.execute(query1, (username))
     airline_name = cursor.fetchone()
@@ -616,6 +636,12 @@ def customersOfFlight():
     d_time = request.form['d_time']
     # cursor used to send queries
     cursor = conn.cursor()
+    #sanity check whether the user is a staff
+    query0 = 'select * from staff where username = %s'
+    cursor.execute(query0, (username))
+    sanityData = cursor.fetchall()
+    if(not sanityData):
+        return render_template('customerConstraint.html')
     query1 = 'SELECT airline_name FROM staff WHERE username = %s'
     cursor.execute(query1, (username))
     airline_name = cursor.fetchone()
@@ -636,6 +662,7 @@ def customersOfFlight():
         return render_template('viewFLights.html', username=username, error='This flight does not exist')
 @app.route('/createFlightInfo', methods=['GET', 'POST'])
 def createFlightInfo():
+    username = session['username']
     airline_name = request.form['airline_name']
     d_date = request.form['departure_date']
     d_time = request.form['departure_time']
@@ -649,6 +676,12 @@ def createFlightInfo():
     dep_code = request.form['departure_airport_code']
 
     cursor = conn.cursor()
+    #sanity check whether the user is a staff
+    query0 = 'select * from staff where username = %s'
+    cursor.execute(query0, (username))
+    sanityData = cursor.fetchall()
+    if(not sanityData):
+        return render_template('customerConstraint.html')
     query = 'SELECT * FROM flight Where airline_name = %s and d_date = %s and d_time = %s and flight_num = %s and status = %s'
     cursor.execute(query,(airline_name, d_date, d_time, flight_num, status))
     data = cursor.fetchone()
@@ -668,8 +701,14 @@ def createFlightInfo():
 def changeFlightStatusInfo():
     flight_num = request.form['flight_number']
     new_status = request.form['new_status']
-
+    username = session['username']
     cursor = conn.cursor()
+    #sanity check whether the user is a staff
+    query0 = 'select * from staff where username = %s'
+    cursor.execute(query0, (username))
+    sanityData = cursor.fetchall()
+    if(not sanityData):
+        return render_template('customerConstraint.html')
     query = 'SELECT * FROM flight WHERE flight_num = %s'
     cursor.execute(query, (flight_num))
     data = cursor.fetchone()
@@ -716,6 +755,12 @@ def addAirplaneInfo():
 def addAirplaneSuccess():
     username = session['username']
     cursor = conn.cursor()
+    #sanity check whether the user is a staff
+    query0 = 'select * from staff where username = %s'
+    cursor.execute(query0, (username))
+    sanityData = cursor.fetchall()
+    if(not sanityData):
+        return render_template('customerConstraint.html')
 
     query = 'SELECT airline_name FROM staff where username = %s'
     cursor.execute(query,(username))
@@ -739,6 +784,12 @@ def popularThreeMonth():
 
     #cursor used to send queries
     cursor = conn.cursor()
+    #sanity check whether the user is a staff
+    query0 = 'select * from staff where username = %s'
+    cursor.execute(query0, (username))
+    sanityData = cursor.fetchall()
+    if(not sanityData):
+        return render_template('customerConstraint.html')
     query1 = 'SELECT airline_name FROM staff WHERE username = %s'
     cursor.execute(query1, (username))
     airline_name = cursor.fetchone()
@@ -764,6 +815,12 @@ def popularYear():
 
     #cursor used to send queries
     cursor = conn.cursor()
+    #sanity check whether the user is a staff
+    query0 = 'select * from staff where username = %s'
+    cursor.execute(query0, (username))
+    sanityData = cursor.fetchall()
+    if(not sanityData):
+        return render_template('customerConstraint.html')
     query1 = 'SELECT airline_name FROM staff WHERE username = %s'
     cursor.execute(query1, (username))
     airline_name = cursor.fetchone()
@@ -789,6 +846,12 @@ def revenueMonth():
 
     #cursor used to send queries
     cursor = conn.cursor()
+    #sanity check whether the user is a staff
+    query0 = 'select * from staff where username = %s'
+    cursor.execute(query0, (username))
+    sanityData = cursor.fetchall()
+    if(not sanityData):
+        return render_template('customerConstraint.html')
     query1 = 'SELECT airline_name FROM staff WHERE username = %s'
     cursor.execute(query1, (username))
     airline_name = cursor.fetchone()
@@ -812,6 +875,12 @@ def revenueYear():
 
     #cursor used to send queries
     cursor = conn.cursor()
+    #sanity check whether the user is a staff
+    query0 = 'select * from staff where username = %s'
+    cursor.execute(query0, (username))
+    sanityData = cursor.fetchall()
+    if(not sanityData):
+        return render_template('customerConstraint.html')
     query1 = 'SELECT airline_name FROM staff WHERE username = %s'
     cursor.execute(query1, (username))
     airline_name = cursor.fetchone()
@@ -835,6 +904,12 @@ def staffViewRatings():
     d_time = request.form['d_time']
     #cursor used to send queries
     cursor = conn.cursor()
+    #sanity check whether the user is a staff
+    query0 = 'select * from staff where username = %s'
+    cursor.execute(query0, (username))
+    sanityData = cursor.fetchall()
+    if(not sanityData):
+        return render_template('customerConstraint.html')
     query1 = 'SELECT airline_name FROM staff WHERE username = %s'
     cursor.execute(query1, (username))
     airline_name = cursor.fetchone()
@@ -866,6 +941,12 @@ def frequentCustomer():
     username = session['username']
     # cursor used to send queries
     cursor = conn.cursor()
+    #sanity check whether the user is a staff
+    query0 = 'select * from staff where username = %s'
+    cursor.execute(query0, (username))
+    sanityData = cursor.fetchall()
+    if(not sanityData):
+        return render_template('customerConstraint.html')
     # executes query
     query1 = 'SELECT airline_name FROM staff WHERE username = %s'
     cursor.execute(query1, (username))
@@ -886,6 +967,12 @@ def flightsCustomerTaken():
     user_email = request.form['email']
     #cursor used to send queries
     cursor = conn.cursor()
+    #sanity check whether the user is a staff
+    query0 = 'select * from staff where username = %s'
+    cursor.execute(query0, (username))
+    sanityData = cursor.fetchall()
+    if(not sanityData):
+        return render_template('customerConstraint.html')
     #executes query
     query1 = 'SELECT airline_name FROM staff WHERE username = %s'
     cursor.execute(query1, (username))
@@ -945,7 +1032,12 @@ def ticketYearReport():
 
     #cursor used to send queries
     cursor = conn.cursor()
-
+    #sanity check whether the user is a staff
+    query0 = 'select * from staff where username = %s'
+    cursor.execute(query0, (username))
+    sanityData = cursor.fetchall()
+    if(not sanityData):
+        return render_template('customerConstraint.html')
 
 #executes query
     query = ' select count(*) as num  from ticket ' \
@@ -976,6 +1068,12 @@ def ticketMonthReport():
 
     #cursor used to send queries
     cursor = conn.cursor()
+    #sanity check whether the user is a staff
+    query0 = 'select * from staff where username = %s'
+    cursor.execute(query0, (username))
+    sanityData = cursor.fetchall()
+    if(not sanityData):
+        return render_template('customerConstraint.html')
     #executes query
     query = ' select count(*) as num  from ticket ' \
             'where purchase_date > current_date() - interval 1 month and airline_name = ' \
@@ -1005,6 +1103,12 @@ def ticketRangeReport():
     end_date = request.form['endDate']
     #cursor used to send queries
     cursor = conn.cursor()
+    #sanity check whether the user is a staff
+    query0 = 'select * from staff where username = %s'
+    cursor.execute(query0, (username))
+    sanityData = cursor.fetchall()
+    if(not sanityData):
+        return render_template('customerConstraint.html')
     #executes query
     query = ' select count(*) as num from ticket ' \
             'where purchase_date >= %s and  purchase_date <= %s and airline_name = ' \
