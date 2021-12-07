@@ -38,8 +38,8 @@ insert into airline values('China Eastern');
 
 	insert into customer values(
 		'zl2728@nyu.edu',
-		md5('Zhilue Li'),
-		'12347',
+		'Zhilue Li',
+		md5('12347'),
 		'370',
 		'Jay Street',
 		'New York',
@@ -73,7 +73,7 @@ insert into airline values('China Eastern');
 
 	insert into staff values(
 		'abc12',
-		'11223',
+		md5('11223'),
 		'Jack',
 		'Lee',
 		'1990-10-1',

@@ -14,12 +14,12 @@ conn = pymysql.connect(host='localhost',
 @app.route('/')
 def hello():
     return render_template('publicHomepage.html')
-
+'''
 @app.errorhandler(Exception)
 def server_error(err):
     app.logger.exception(err)
     return "exception", 500
-
+'''
 #Define route for customer register
 @app.route('/customerRegister')
 def customerRegister():
@@ -349,8 +349,8 @@ def priceCheck():
 
 @app.route('/roundFlightSearchProcess', methods=['GET', 'POST'])
 def roundFlightSearchProcess():
-
-    username = session['username']
+    if(session.get('username') == True):
+        username = session['username']
 
     #grabs information from the forms
     dep_date = request.form['dep_date']
@@ -379,7 +379,9 @@ def roundFlightSearchProcess():
     for each in data2:
         print(each)
     cursor.close()
-    return render_template('roundFlightSearch.html', username=username, posts1=data1, posts2 = data2)
+    if(session.get('username') == True):
+        return render_template('roundFlightSearch.html', username=username, posts1=data1, posts2 = data2)
+    return render_template('roundFlightSearch.html',  posts1=data1, posts2 = data2)
 
 @app.route('/statusSearchProcess', methods=['GET', 'POST'])
 def statusSearchProcess():
@@ -415,7 +417,9 @@ def checkFutureFlights():
     #cursor used to send queries
     cursor = conn.cursor()
     #executes query
-    query = 'select * from ticket where customer_email = %s and d_date > current_date or (d_date = current_date and d_time > current_time)'
+
+    query = 'select * from ticket where customer_email = %s and (d_date > current_date or (d_date = current_date and d_time > current_time))'
+    print(query)
     #stores the results in a variable
     cursor.execute(query,(username))
     data1 = cursor.fetchall()
@@ -766,7 +770,6 @@ def customersOfFlight():
 @app.route('/createFlightInfo', methods=['GET', 'POST'])
 def createFlightInfo():
     username = session['username']
-    airline_name = request.form['airline_name']
     d_date = request.form['departure_date']
     d_time = request.form['departure_time']
     flight_num = request.form['flight_number']
@@ -788,15 +791,16 @@ def createFlightInfo():
 
 
     #check 0 airplane exist?
-    check0 = 'select * from airplane where code = %s'
-    cursor.execute(check0,(arr_code))
+    check0 = 'select * from airplane where iden_num = %s and airline_name = ' \
+             '(select airline_name from staff where username = %s)'
+    cursor.execute(check0,(airplane_i_num,username))
     checkdata = cursor.fetchall()
     if(not checkdata):
         error = "Not valid for airplane"
         return render_template('createFlight.html', error = error)
 
     #check 0 airpoet exist?
-    check0 = 'select * from airplane where code = %s'
+    check0 = 'select * from airport where code = %s'
     cursor.execute(check0,(dep_code))
     checkdata = cursor.fetchall()
     if(not checkdata):
@@ -804,16 +808,18 @@ def createFlightInfo():
         return render_template('createFlight.html', error = error)
 
     #check 0  airport exist?
-    check0 = 'select * from airport where iden_num = %s'
-    cursor.execute(check0,(airplane_i_num))
+    check0 = 'select * from airport where code = %s'
+    cursor.execute(check0,(arr_code))
     checkdata = cursor.fetchall()
     if(not checkdata):
         error = "This is not a valid arrival airport"
         return render_template('createFlight.html', error = error)
 
 
-    query = 'SELECT * FROM flight Where airline_name = %s and d_date = %s and d_time = %s and flight_num = %s and status = %s'
-    cursor.execute(query,(airline_name, d_date, d_time, flight_num, status))
+    query = 'SELECT * FROM flight Where airline_name = ' \
+            '(select airline_name from staff where username = %s)' \
+            ' and d_date = %s and d_time = %s and flight_num = %s and status = %s'
+    cursor.execute(query,(username, d_date, d_time, flight_num, status))
     data = cursor.fetchone()
     error = None
 
@@ -821,8 +827,9 @@ def createFlightInfo():
         error = "This flight already exists"
         return render_template('createFlight.html', error = error)
     else:
-        ins = 'INSERT INTO flight VALUES(%s, %s, %s, %s, %s, %s, %d, %s, %s, %s, %s)'
-        cursor.execute(ins, (airline_name, d_date, d_time, flight_num, a_date, a_time, int(base_price), status, airplane_i_num, arr_code, dep_code))
+        ins = 'INSERT INTO flight VALUES((select airline_name from staff where username = %s) ' \
+              ', %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)'
+        cursor.execute(ins, (username, d_date, d_time, flight_num, a_date, a_time, int(base_price), status, airplane_i_num, arr_code, dep_code))
         conn.commit()
         cursor.close()
         return render_template('staffHome.html')
@@ -852,7 +859,7 @@ def changeFlightStatusInfo():
 
     if(data):
         ins = 'UPDATE flight SET status = %s WHERE flight_num = %s and d_date = %s and d_time = %s' \
-              ' and airline_name = (select airline_name from staff where name = %s )'
+              ' and airline_name = (select airline_name from staff where username = %s )'
         cursor.execute(ins,(new_status, flight_num,  d_date, d_time, username))
         conn.commit()
         cursor.close()

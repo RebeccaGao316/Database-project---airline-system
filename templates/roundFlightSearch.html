@@ -33,6 +33,8 @@
     <table>
         <th>Airline name</th>
         <th>flight number</th>
+        <th>departure date</th>
+        <th>departure time</th>
 
 
 
@@ -40,6 +42,8 @@
             <tr>
                 <td>{{line['airline_name']}}</td>
                 <td>{{line['flight_num']}}</td>
+                <td>{{line['d_date']}}</td>
+                <td>{{line['d_time']}}</td>
             </tr>
         {% endfor %}
     </table>
@@ -48,6 +52,8 @@
     <table>
         <th>return Airline name</th>
         <th>return flight number</th>
+        <th>departure date</th>
+        <th>departure time</th>
 
 
 
@@ -55,6 +61,8 @@
             <tr>
                 <td>{{line['airline_name']}}</td>
                 <td>{{line['flight_num']}}</td>
+                <td>{{line['d_date']}}</td>
+                <td>{{line['d_time']}}</td>
             </tr>
         {% endfor %}
     </table>
