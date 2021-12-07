@@ -270,6 +270,7 @@ def flightSearchProcess():
 
     #cursor used to send queries
     cursor = conn.cursor()
+
     #executes query
     query = 'SELECT * FROM flight WHERE d_date = %s ' \
             'and dep_airport_code = (select code from airport where airport.name = %s) ' \
@@ -284,6 +285,62 @@ def flightSearchProcess():
     if(session.get('username') == True):
         return render_template('flightSearch.html', username=username, posts=data1)
     return render_template('flightSearch.html',  posts=data1)
+
+@app.route('/priceCheck', methods=['GET', 'POST'])
+def priceCheck():
+    if(session.get('username') == True):
+        username = session['username']
+
+
+    #grabs information from the forms
+    d_date = request.form['d_date']
+    d_time = request.form['d_time']
+    airlineName = request.form['airlineName']
+    flightNum = request.form['flightNum']
+
+    #cursor used to send queries
+    cursor = conn.cursor()
+
+    #cursor used to send queries
+    cursor = conn.cursor()
+    #check 0 whether the info indicate a flight
+    check0 = 'select * from flight where ' \
+             '  airline_name = %s and d_date = %s and d_time = %s ' \
+             'and flight_num = %s'
+    cursor.execute(check0,(airlineName,d_date,d_time,flightNum))
+    checkdata = cursor.fetchall()
+    if(not checkdata):
+        error = "This is not a valid flight"
+        return render_template('flightSearch.html', error = error)
+
+
+    #executes query
+    query = 'select count(*) as number_seat from ticket natural join flight ' \
+            'where flight_num = %s and airline_name = %s and d_date = %s and d_time = %s '
+    #stores the results in a variable
+    cursor.execute(query,(flightNum,airlineName,d_date,d_time))
+    currentSell = cursor.fetchone()
+    query = 'select distinct number_seat from flight natural join airline natural join airplane ' \
+            'where flight_num = %s and airline_name = %s and d_date = %s and d_time = %s '
+    cursor.execute(query,(flightNum,airlineName,d_date,d_time))
+    totalNum = cursor.fetchone();
+    query = 'select base_price from flight ' \
+            'where flight_num = %s and airline_name = %s and d_date = %s and d_time = %s '
+    cursor.execute(query,(flightNum,airlineName,d_date,d_time))
+    basePrice = cursor.fetchone();
+    basePrice = float(basePrice["base_price"])
+    if(float(currentSell["number_seat"]) == float(totalNum["number_seat"])):
+        error = "THE ticket is sold out"
+        return render_template('customerRate.html', error = error)
+    if(float(currentSell["number_seat"]) > 0.75 * float(totalNum["number_seat"])):
+        price = 1.25*basePrice
+    else:
+        price = basePrice
+
+    cursor.close()
+    if(session.get('username') == True):
+        return render_template('flightSearch.html', username=username, price = price)
+    return render_template('flightSearch.html', price = price)
 
 @app.route('/roundFlightSearchProcess', methods=['GET', 'POST'])
 def roundFlightSearchProcess():
@@ -454,7 +511,7 @@ def rateAndComment():
     star = request.form['star']
     comment = request.form['comment']
     error = None
-    if(not isinstance(star,int)):
+    if(not star.isnumeric()):
         error = "This is not a valid integer for star"
         return render_template('customerRate.html', error = error)
 
@@ -486,6 +543,7 @@ def rateAndComment():
 
     query = 'insert into rate VALUES(%s,%s,%s,%s,%s,%s,%s)'
     cursor.execute(query,(airlineName,departureDate,departureTime,flightNum,username,comment,star))
+    print('done')
     conn.commit()
     cursor.close()
     return render_template('customerRate.html')

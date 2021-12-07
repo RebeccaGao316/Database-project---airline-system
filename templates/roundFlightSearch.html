@@ -59,6 +59,23 @@
         {% endfor %}
     </table>
     {% if session['username'] %}
+        <h1>You can check the price of the ticket since you have already login!</h1>
+        <form action="/priceCheck" method="POST">
+            copy the airline name from the search result here:
+            <input type="text" name = "airlineName" placeholder="airline name" required/></br>
+            copy the departure date from the search result here:
+            <input type="date" name = "d_date" placeholder="departure date" required/></br>
+            copy the departure time from the search result here:
+            <input type="time" name = "d_time" placeholder="departure time" required/></br>
+            copy the flight number from the search result here:
+            <input type="text" name = "flightNum" placeholder="flight number" required/></br>
+            <input type="submit" value = check />
+            {% if error %}
+                <p class="error"><strong>Error:</strong> {{error}}</p>
+            {% endif %}
+            <h2>The price of that ticket is {{ price }}</h2>
+        </form>
+
         <h1>You can buy the ticket since you have already login!</h1>
         <h1>Following form to select a tickets and give payment information</h1>
         <form action="/purchaseTicket" method="POST">
