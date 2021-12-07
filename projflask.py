@@ -15,6 +15,11 @@ conn = pymysql.connect(host='localhost',
 def hello():
     return render_template('publicHomepage.html')
 
+@app.errorhandler(Exception)
+def server_error(err):
+    app.logger.exception(err)
+    return "exception", 500
+
 #Define route for customer register
 @app.route('/customerRegister')
 def customerRegister():

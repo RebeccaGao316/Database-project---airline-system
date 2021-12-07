@@ -38,8 +38,8 @@ primary key (code)
 );
 
 create table customer(
-email varchar(30),
-name varchar(20) not null,
+email varchar(40),
+name varchar(40) not null,
 password varchar(64) not null,
 building_num varchar(5),
 street varchar(20),
