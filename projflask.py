@@ -14,12 +14,11 @@ conn = pymysql.connect(host='localhost',
 @app.route('/')
 def hello():
     return render_template('publicHomepage.html')
-'''
+
 @app.errorhandler(Exception)
 def server_error(err):
     app.logger.exception(err)
     return "exception", 500
-'''
 #Define route for customer register
 @app.route('/customerRegister')
 def customerRegister():
@@ -1077,7 +1076,7 @@ def staffViewRatings():
         cursor.close()
         return render_template('viewFlightRatings.html', username = username, error= error, posts1 = data1, chart1 = data2)
     else:
-        return render_template('viewFlightRatings.html', username = username, error = 'This flight does not exist' )
+        return render_template('viewFlightRatings.html', username = username, error = 'No flight or no record' )
 
 
 @app.route('/frequentCustomer', methods=['GET', 'POST'])
