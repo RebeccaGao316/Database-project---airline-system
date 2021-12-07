@@ -56,6 +56,17 @@ def pastFlightStatus():
 
 @app.route('/staffHome')
 def staffHome():
+    username = session['username']
+    # cursor used to send queries
+    cursor = conn.cursor()
+    #sanity check whether the user is a staff
+    query0 = 'select * from staff where username = %s'
+    cursor.execute(query0, (username))
+    sanityData = cursor.fetchall()
+    if(not sanityData):
+        cursor.close()
+        return render_template('customerConstraint.html')
+    cursor.close()
     return render_template('staffHome.html')
 
 @app.route('/viewFlights')
@@ -76,6 +87,17 @@ def addAirplane():
 
 @app.route('/customerHome')
 def customerHome():
+    username = session['username']
+    # cursor used to send queries
+    cursor = conn.cursor()
+    #sanity check whether the user is a staff
+    query0 = 'select * from customer where email = %s'
+    cursor.execute(query0, (username))
+    sanityData = cursor.fetchall()
+    if(not sanityData):
+        cursor.close()
+        return render_template('staffHome.html')
+    cursor.close()
     return render_template('customerHome.html')
 
 @app.route('/createFlight')
@@ -354,6 +376,17 @@ def purchaseTicket():
 
     #cursor used to send queries
     cursor = conn.cursor()
+    #check 0 whether the info indicate a flight
+    check0 = 'select * from flight where ' \
+             '  airline_name = %s and d_date = %s and d_time = %s ' \
+             'and flight_num = %s'
+    cursor.execute(check0,(airlineName,departureDate,departureTime,flightNum))
+    checkdata = cursor.fetchall()
+    if(not checkdata):
+        error = "This is not a valid flight"
+        return render_template('customerRate.html', error = error)
+
+
     #executes query
     query = 'select count(*) as number_seat from ticket natural join flight ' \
             'where flight_num = %s and airline_name = %s and d_date = %s and d_time = %s '
@@ -370,7 +403,8 @@ def purchaseTicket():
     basePrice = cursor.fetchone();
     basePrice = float(basePrice["base_price"])
     if(float(currentSell["number_seat"]) == float(totalNum["number_seat"])):
-        return render_template('404.html')
+        error = "THE ticket is sold out"
+        return render_template('customerRate.html', error = error)
     if(float(currentSell["number_seat"]) > 0.75 * float(totalNum["number_seat"])):
         price = 1.25*basePrice
     else:
@@ -383,7 +417,7 @@ def purchaseTicket():
     cursor.execute(query,(price,cardType,cardNum,expDate,airlineName,departureDate,departureTime,flightNum,username))
     conn.commit()
     cursor.close()
-    return render_template('purchaseDone.html')
+    return render_template('purchaseDone.html', price = price)
 
 
 
@@ -420,6 +454,9 @@ def rateAndComment():
     star = request.form['star']
     comment = request.form['comment']
     error = None
+    if(not isinstance(star,int)):
+        error = "This is not a valid integer for star"
+        return render_template('customerRate.html', error = error)
 
 
     #cursor used to send queries
@@ -590,6 +627,7 @@ def flightsBasedOnDate():
         cursor.close()
         return render_template('viewFlights.html', username=username, error=error, chart2=data1)
     else:
+        cursor.close()
         return render_template('viewFLights.html', username=username, error='No flights in this period!')
 
 @app.route('/flightsBasedOnLocation', methods=['GET', 'POST'])
@@ -606,6 +644,8 @@ def flightsBasedOnLocation():
     sanityData = cursor.fetchall()
     if(not sanityData):
         return render_template('customerConstraint.html')
+
+
     query1 = 'SELECT airline_name FROM staff WHERE username = %s'
     cursor.execute(query1, (username))
     airline_name = cursor.fetchone()
@@ -682,6 +722,33 @@ def createFlightInfo():
     sanityData = cursor.fetchall()
     if(not sanityData):
         return render_template('customerConstraint.html')
+
+
+    #check 0 airplane exist?
+    check0 = 'select * from airplane where code = %s'
+    cursor.execute(check0,(arr_code))
+    checkdata = cursor.fetchall()
+    if(not checkdata):
+        error = "Not valid for airplane"
+        return render_template('createFlight.html', error = error)
+
+    #check 0 airpoet exist?
+    check0 = 'select * from airplane where code = %s'
+    cursor.execute(check0,(dep_code))
+    checkdata = cursor.fetchall()
+    if(not checkdata):
+        error = "Not valid for departure airport"
+        return render_template('createFlight.html', error = error)
+
+    #check 0  airport exist?
+    check0 = 'select * from airport where iden_num = %s'
+    cursor.execute(check0,(airplane_i_num))
+    checkdata = cursor.fetchall()
+    if(not checkdata):
+        error = "This is not a valid arrival airport"
+        return render_template('createFlight.html', error = error)
+
+
     query = 'SELECT * FROM flight Where airline_name = %s and d_date = %s and d_time = %s and flight_num = %s and status = %s'
     cursor.execute(query,(airline_name, d_date, d_time, flight_num, status))
     data = cursor.fetchone()
@@ -700,8 +767,12 @@ def createFlightInfo():
 @app.route('/changeFlightStatusInfo', methods=['GET', 'POST'])
 def changeFlightStatusInfo():
     flight_num = request.form['flight_number']
+    d_date = request.form['d_date']
+    d_time = request.form['d_time']
     new_status = request.form['new_status']
     username = session['username']
+    if(new_status != "on-time" and new_status != "delayed"):
+        return render_template('changeFlightStatus.html', error = "invalid status")
     cursor = conn.cursor()
     #sanity check whether the user is a staff
     query0 = 'select * from staff where username = %s'
@@ -709,14 +780,17 @@ def changeFlightStatusInfo():
     sanityData = cursor.fetchall()
     if(not sanityData):
         return render_template('customerConstraint.html')
-    query = 'SELECT * FROM flight WHERE flight_num = %s'
-    cursor.execute(query, (flight_num))
+
+    query = 'SELECT * FROM flight WHERE flight_num = %s and d_date = %s and d_time = %s' \
+            ' and airline_name = (select airline_name from staff where username = %s )'
+    cursor.execute(query, (flight_num, d_date, d_time, username))
     data = cursor.fetchone()
     error = None
 
     if(data):
-        ins = 'UPDATE flight SET status = %s WHERE flight_num = %s'
-        cursor.execute(ins,(new_status, flight_num))
+        ins = 'UPDATE flight SET status = %s WHERE flight_num = %s and d_date = %s and d_time = %s' \
+              ' and airline_name = (select airline_name from staff where name = %s )'
+        cursor.execute(ins,(new_status, flight_num,  d_date, d_time, username))
         conn.commit()
         cursor.close()
         return render_template('staffHome.html')

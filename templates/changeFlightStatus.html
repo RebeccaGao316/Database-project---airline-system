@@ -5,6 +5,9 @@
     <h1>Change Flight Status</h1>
 <form action="/changeFlightStatusInfo" method="POST">
 	<input type="text" name = "flight_number" placeholder="flight_number" required/></br>
+    <input type="date" name = "d_date" placeholder="departure date" required/></br>
+    <input type="time" name = "d_time" placeholder="departure time" required/></br>
+
     	<input type="text" name = "new_status" placeholder="new_status" required/></br>
 
 	<input type="submit" value = Change />
@@ -13,6 +16,6 @@
 	{% endif %}
 </form>
 
-<a href="/">Go back</a>
+    <a href="/staffHome">Go back</a>
 </body>
 </html>

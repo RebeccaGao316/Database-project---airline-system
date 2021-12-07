@@ -4,8 +4,8 @@
 <body>
 <form action="/staffViewRatings" method="POST">
 	<input type="text" name = "flight_num" placeholder="flight_num" required/> </br>
-	<input type="text" name = "d_date" placeholder="d_date" required/></br>
-	<input type="text" name = "d_time" placeholder="d_time" required/></br>
+	<input type="date" name = "d_date" placeholder="d_date" required/></br>
+	<input type="time" name = "d_time" placeholder="d_time" required/></br>
 	<input type="submit" value = View />
 	<h2>
 	{% if error %}
