@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>add phone</title>
+</head>
+<body>
+<form action="/extraphone" method="POST">
+    <input type="text" name = "phone" placeholder="phone" required/> </br>
+
+    <input type="submit" value = add />
+    {% if error %}
+        ADDPROCESS: {{error}}
+    {% endif %}
+</form>
+</body>
+</html>

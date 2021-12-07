@@ -4,10 +4,23 @@
 <body>
     <h1>User register</h1>
 <form action="/customerRegisterAuth" method="POST">
+email:
 	<input type="email" name = "username" placeholder="username" required/> </br>
+password:
 	<input type="password" name = "userpassword" placeholder="userpassword" required/></br>
+name:
     <input type="text" name = "name" placeholder="name" required/></br>
+    buildingNum:
+    <input type="text" name = "buildingNum" placeholder="building number" required/></br>
+    street: <input type="text" name = "street" placeholder="street" required/></br>
+    city: <input type="text" name = "city" placeholder="city" required/></br>
+    state: <input type="text" name = "state" placeholder="state" required/></br>
 
+    phoneNum: <input type="text" name = "phoneNum" placeholder="phoneNum" required/></br>
+    passportNum:<input type="text" name = "passportNum" placeholder="passportNum" required/></br>
+    passportExp: <input type="date" name = "passportExp" placeholder="passportExp" required/></br>
+    passportCountry: <input type="text" name = "passportC" placeholder="passport Country" required/></br>
+    birthday:<input type="date" name = "birthday" placeholder="birthday" required/></br>
 	<input type="submit" value = Register />
 	{% if error %}
 		<p class="error"><strong>Error:</strong> {{error}}</p>

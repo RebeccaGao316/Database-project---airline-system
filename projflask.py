@@ -14,11 +14,12 @@ conn = pymysql.connect(host='localhost',
 @app.route('/')
 def hello():
     return render_template('publicHomepage.html')
-
+'''
 @app.errorhandler(Exception)
 def server_error(err):
     app.logger.exception(err)
     return "exception", 500
+    '''
 #Define route for customer register
 @app.route('/customerRegister')
 def customerRegister():
@@ -27,7 +28,9 @@ def customerRegister():
 @app.route('/staffRegister')
 def staffRegister():
     return render_template('staffRegister.html')
-
+@app.route('/addPhone')
+def addPhone():
+    return render_template('addPhone.html')
 
 #Define route for customer login
 @app.route('/customerLogin', methods=['GET', 'POST'])
@@ -155,6 +158,15 @@ def customerRegisterAuth():
     username = request.form['username']
     password = request.form['userpassword']
     name = request.form['name']
+    buildingNum = request.form['buildingNum']
+    street = request.form['street']
+    city = request.form['city']
+    state = request.form['state']
+    phoneNum = request.form['phoneNum']
+    passportNum = request.form['passportNum']
+    passportExp = request.form['passportExp']
+    passportCountry = request.form['passportC']
+    birthday = request.form['birthday']
 
     #cursor used to send queries
     cursor = conn.cursor()
@@ -171,8 +183,8 @@ def customerRegisterAuth():
         error = "This user already exists"
         return render_template('register.html', error = error)
     else:
-        ins = 'INSERT INTO customer VALUES(%s, %s, md5(%s), null,null,null, null,null,null, null,null,null)'
-        cursor.execute(ins, (username, name, password))
+        ins = 'INSERT INTO customer VALUES(%s, %s, md5(%s), %s,%s,%s, %s,%s,%s, %s,%s,%s)'
+        cursor.execute(ins, (username, name, password,buildingNum,street,city,state,phoneNum,passportNum,passportExp,passportCountry,birthday))
         conn.commit()
         cursor.close()
         return render_template('publicHomepage.html')
@@ -1272,6 +1284,30 @@ def ticketRangeReport():
         print(each)
     cursor.close()
     return render_template('viewTicketReport.html', username=username, posts3=data1, chart3 = data2)
+
+@app.route('/extraphone', methods=['GET', 'POST'])
+def extraphone():
+    username = session['username']
+    phonenum = request.form['phone']
+    cursor = conn.cursor()
+#sanity check whether the user is a staff
+    query0 = 'select * from staff where username = %s'
+    cursor.execute(query0, (username))
+    sanityData = cursor.fetchall()
+    if(not sanityData):
+        return render_template('customerConstraint.html')
+    #check whether the phone is occupied
+        query0 = 'select * from staff_phone where phone_num = %s'
+    cursor.execute(query0, (phonenum))
+    sanityData = cursor.fetchall()
+    if(sanityData):
+        return render_template('addPhone.html', error = "phone already exists")
+    query = 'insert into staff_phone values (%s,%s)'
+    cursor.execute(query,(username,phonenum))
+    conn.commit()
+    cursor.close()
+    return render_template('addPhone.html',error = "done")
+    #stores the results in a variable
 
 
 @app.route('/logout')
