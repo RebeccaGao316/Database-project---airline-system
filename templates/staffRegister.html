@@ -5,9 +5,13 @@
 <h1>Staff register</h1>
 
 <form action="/staffRegisterAuth" method="POST">
-	<input type="text" name = "staffname" placeholder="staffname" required/> </br>
-	<input type="password" name = "staffpassword" placeholder="staffpassword" required/></br>
-    <input type="text" name = "airlineName" placeholder="airlineName" required/></br>
+	username:<input type="text" name = "staffname" placeholder="staffname" required/> </br>
+	Password:<input type="password" name = "staffpassword" placeholder="staffpassword" required/></br>
+    	Airline name:<input type="text" name = "airlineName" placeholder="airlineName" required/></br>
+	firstname:<input type="text" name = "first_name" placeholder="firstName" required/></br>
+	lastname:<input type="text" name = "last_name" placeholder="lastName" required/></br>
+	birthday information:<input type="date" name = "date_of_birth" placeholder="birthdate" required/></br>
+	phone number:<input type="text" name = "phone_number" placeholder="phoneNumber" required/></br>
 
 	<input type="submit" value = Register />
 	{% if error %}

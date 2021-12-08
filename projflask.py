@@ -14,12 +14,10 @@ conn = pymysql.connect(host='localhost',
 @app.route('/')
 def hello():
     return render_template('publicHomepage.html')
-'''
 @app.errorhandler(Exception)
 def server_error(err):
     app.logger.exception(err)
     return "exception", 500
-    '''
 #Define route for customer register
 @app.route('/customerRegister')
 def customerRegister():
@@ -181,38 +179,10 @@ def customerRegisterAuth():
         #If the previous query returns data, then user exists
         #If the previous query returns data, then user exists
         error = "This user already exists"
-        return render_template('register.html', error = error)
+        return render_template('customerRegister.html', error = error)
     else:
         ins = 'INSERT INTO customer VALUES(%s, %s, md5(%s), %s,%s,%s, %s,%s,%s, %s,%s,%s)'
         cursor.execute(ins, (username, name, password,buildingNum,street,city,state,phoneNum,passportNum,passportExp,passportCountry,birthday))
-        conn.commit()
-        cursor.close()
-        return render_template('publicHomepage.html')
-
-
-@app.route('/staffRegisterAuth', methods=['GET', 'POST'])
-def staffRegisterAuth():
-    #grabs information from the forms
-    username = request.form['staffname']
-    password = request.form['staffpassword']
-    airlineName = request.form['airlineName']
-
-    #cursor used to send queries
-    cursor = conn.cursor()
-    #executes query
-    query = 'SELECT * FROM staff WHERE username = md5(%s)'
-    cursor.execute(query, (username))
-    #stores the results in a variable
-    data = cursor.fetchone()
-    #use fetchall() if you are expecting more than 1 data row
-    if(data):
-        #If the previous query returns data, then user exists
-        #If the previous query returns data, then user exists
-        error = "This user already exists"
-        return render_template('register.html', error = error)
-    else:
-        ins = 'INSERT INTO staff VALUES(%s, md5(%s),null,null,null,%s)'
-        cursor.execute(ins, (username, password, airlineName))
         conn.commit()
         cursor.close()
         return render_template('publicHomepage.html')
@@ -245,6 +215,55 @@ def customerLoginAuth():
         #returns an error message to the html page
         error = 'Invalid login or username'
         return render_template('customerLogin.html', error=error)
+
+
+@app.route('/staffRegisterAuth', methods=['GET', 'POST'])
+def staffRegisterAuth():
+    #grabs information from the forms
+    username = request.form['staffname']
+    password = request.form['staffpassword']
+    airlineName = request.form['airlineName']
+    first_name = request.form['first_name']
+    last_name = request.form['last_name']
+    date_of_birth = request.form['date_of_birth']
+    phone_number = request.form['phone_number']
+
+    #cursor used to send queries
+    cursor = conn.cursor()
+    #executes query
+    query = 'SELECT * FROM staff WHERE username = %s'
+    query1 = 'SELECT * FROM staff_phone WHERE phone_num = %s'
+    query2 = 'SELECT * FROM airline WHERE name = %s'
+    cursor.execute(query, (username))
+    #stores the results in a variable
+    data = cursor.fetchone()
+    #use fetchall() if you are expecting more than 1 data row
+    cursor.execute(query1, (phone_number))
+    data1 = cursor.fetchone()
+
+    cursor.execute(query2, (airlineName))
+    data2 = cursor.fetchone()
+    if(data):
+        #If the previous query returns data, then user exists
+        #If the previous query returns data, then user exists
+        error = "This user already exists"
+        return render_template('staffRegister.html', error = error)
+    elif(data1):
+        error = "This phone number is registered by someone else"
+        return render_template('staffRegister.html', error = error)
+    elif(data2 == None):
+        error = "This airline does not exist"
+        return render_template('staffRegister.html', error = error)
+    else:
+        ins = 'INSERT INTO staff VALUES(%s, md5(%s),%s, %s, %s, %s)'
+        cursor.execute(ins, (username, password, first_name, last_name, date_of_birth, airlineName))
+        cursor = conn.cursor()
+        ins = 'INSERT INTO staff_phone VALUES(%s, %s)'
+        cursor.execute(ins, (username, phone_number))
+        conn.commit()
+        cursor.close()
+        return render_template('publicHomepage.html')
+
 
 
 @app.route('/staffLoginAuth', methods=['GET', 'POST'])
@@ -336,8 +355,9 @@ def priceCheck():
     #stores the results in a variable
     cursor.execute(query,(flightNum,airlineName,d_date,d_time))
     currentSell = cursor.fetchone()
-    query = 'select distinct number_seat from flight natural join airline natural join airplane ' \
-            'where flight_num = %s and airline_name = %s and d_date = %s and d_time = %s '
+    query = 'select  number_seat from flight join airline ON flight.airline_name = airline.name ' \
+                        'join airplane on flight.airplane_i_num = airplane.iden_num ' \
+                        'where flight_num = %s and flight.airline_name = %s and d_date = %s and d_time = %s'
     cursor.execute(query,(flightNum,airlineName,d_date,d_time))
     totalNum = cursor.fetchone();
     query = 'select base_price from flight ' \
@@ -347,7 +367,7 @@ def priceCheck():
     basePrice = float(basePrice["base_price"])
     if(float(currentSell["number_seat"]) == float(totalNum["number_seat"])):
         error = "THE ticket is sold out"
-        return render_template('customerRate.html', error = error)
+        return render_template('flightSearch.html', error = error)
     if(float(currentSell["number_seat"]) > 0.75 * float(totalNum["number_seat"])):
         price = 1.25*basePrice
     else:
@@ -461,7 +481,7 @@ def purchaseTicket():
     checkdata = cursor.fetchall()
     if(not checkdata):
         error = "This is not a valid flight"
-        return render_template('customerRate.html', error = error)
+        return render_template('flightSearch.html', error = error)
 
 
     #executes query
@@ -470,8 +490,12 @@ def purchaseTicket():
     #stores the results in a variable
     cursor.execute(query,(flightNum,airlineName,departureDate,departureTime))
     currentSell = cursor.fetchone()
-    query = 'select distinct number_seat from flight natural join airline natural join airplane ' \
-            'where flight_num = %s and airline_name = %s and d_date = %s and d_time = %s '
+
+    #query = 'select  number_seat from flight natural join airline natural join airplane ' \
+    #        'where flight_num = %s and airline_name = %s and d_date = %s and d_time = %s '
+    query = 'select  number_seat from flight join airline ON flight.airline_name = airline.name ' \
+            'join airplane on flight.airplane_i_num = airplane.iden_num ' \
+            'where flight_num = %s and flight.airline_name = %s and d_date = %s and d_time = %s'
     cursor.execute(query,(flightNum,airlineName,departureDate,departureTime))
     totalNum = cursor.fetchone();
     query = 'select base_price from flight ' \
@@ -479,9 +503,10 @@ def purchaseTicket():
     cursor.execute(query,(flightNum,airlineName,departureDate,departureTime))
     basePrice = cursor.fetchone();
     basePrice = float(basePrice["base_price"])
+
     if(float(currentSell["number_seat"]) == float(totalNum["number_seat"])):
         error = "THE ticket is sold out"
-        return render_template('customerRate.html', error = error)
+        return render_template('flightSearch.html', error = error)
     if(float(currentSell["number_seat"]) > 0.75 * float(totalNum["number_seat"])):
         price = 1.25*basePrice
     else:
